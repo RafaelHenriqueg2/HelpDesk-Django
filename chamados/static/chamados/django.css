@@ -1,0 +1,48 @@
+/* Adaptações dos templates Django; identidade visual original em style.css. */
+.field { display: grid; gap: 8px; margin-bottom: 18px; }
+.field label { font-size: 13px; font-weight: 700; }
+.field input, .field textarea, .field select, .search-form > input, .search-form > select, .status-form select { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--foreground); padding: 12px; }
+.field textarea { resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+.errorlist { padding: 12px 12px 12px 30px; margin: 8px 0; background: var(--surface-soft); color: var(--danger); border-left: 3px solid var(--danger); font-size: 13px; }
+.form-panel { max-width: 800px; }
+.search-form { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+.search-form .search-field, .search-form > input { flex: 1; min-width: 180px; }
+.search-form > select { width: auto; }
+.search-form .back-link { margin: 0; }
+.users-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 14px 10px; border-bottom: 1px solid var(--border); font-size: 13px; overflow-wrap: anywhere; }
+th { color: var(--muted); font-size: 11px; }
+.text-link { color: var(--primary); }
+.danger-link { color: var(--danger); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.danger-link:focus-visible { outline: 2px solid var(--danger); outline-offset: 4px; }
+.danger-button { color: var(--danger); border-color: var(--danger); }
+.confirmation-choice { display: flex; align-items: flex-start; gap: 10px; margin: 24px 0; }
+.confirmation-choice input { width: auto; margin-top: 4px; }
+.status-form { display: grid; gap: 8px; min-width: 210px; }
+.pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px; margin-top: 24px; font-size: 13px; }
+.preserve-lines { white-space: pre-wrap; overflow-wrap: anywhere; }
+.history-panel { margin-top: 24px; }
+.action-section { padding: 18px 0; border-top: 1px solid var(--border); }
+.action-section summary { cursor: pointer; font-weight: 700; margin-bottom: 16px; }
+.action-section form { max-width: 760px; }
+.internal-note { border: 1px dashed var(--primary); background: var(--surface-soft); }
+.solution-box { margin-top: 24px; padding: 18px; border-left: 4px solid var(--primary); background: var(--surface-soft); }
+.event-item { padding: 14px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.deadline-overdue { color: var(--danger); font-weight: 700; }
+.unread-badge { padding: 4px 8px; border-radius: 8px; background: var(--primary); color: white; font-size: 11px; }
+.notification-link { padding: 16px; color: var(--primary); font-weight: 700; }
+.mobile-notifications { display: none; }
+.field input[type="checkbox"] { width: auto; justify-self: start; }
+.advanced-filters { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.advanced-filters label { flex: 1 1 160px; }
+@media (max-width: 760px) { .mobile-notifications { display: block; padding: 10px 20px; color: var(--primary); } }
+.message-form { margin-top: 24px; }
+.page-footer { margin-top: 40px; color: var(--muted); font-size: 11px; text-align: center; }
+.mobile-nav { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.ticket-title, h1, dd { overflow-wrap: anywhere; }
+@media (max-width: 1000px) { .users-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .mobile-nav { display: flex; flex-wrap: wrap; gap: 15px; padding: 14px 20px; background: var(--surface); font-size: 12px; color: var(--primary); } .ticket-admin-actions { flex-direction: column; align-items: stretch; } .search-form > select { flex: 1; } }

@@ -1,0 +1,2 @@
+-r requirements.txt
+django-storages[s3]>=1.14.6,<2

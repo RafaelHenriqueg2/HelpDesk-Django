@@ -1,0 +1,8 @@
+Django>=5.2.8,<5.3
+djangorestframework>=3.16,<4
+PyJWT>=2.10,<3
+python-dotenv>=1.1,<2
+dj-database-url>=3,<4
+psycopg[binary]>=3.2,<4
+Pillow>=11,<13
+bcrypt>=4,<6

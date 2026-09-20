@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}{{ chamado.protocolo }} | HelpDesk{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'inicio' %}">← Voltar aos chamados</a>
+<section class="ticket-detail-heading">
+  <div><p class="eyebrow">{{ chamado.protocolo }} · {{ chamado.categoria|default:'Outros' }}</p><h1>{{ chamado.assunto }}</h1></div>
+  <span class="status-badge status-{{ chamado.status|lower }}">{{ chamado.get_status_display }}</span>
+</section>
+<div class="ticket-detail-layout">
+  <article class="panel"><h2>Descrição</h2><p class="preserve-lines">{{ chamado.descricao }}</p>
+    {% if chamado.solucao %}<div class="solution-box"><h2>Solução registrada</h2><p class="preserve-lines">{{ chamado.solucao }}</p>
+    {% if chamado.confirmado_em %}<p>Confirmada em {{ chamado.confirmado_em|date:'d/m/Y H:i' }}.</p>{% endif %}
+    {% if pode_confirmar %}<form method="post" action="{% url 'acao_chamado' chamado.id 'confirmar' %}">{% csrf_token %}<button class="primary-button">Confirmar que foi resolvido</button></form>{% endif %}</div>{% endif %}
+    {% if pode_reabrir %}<details class="action-section"><summary>O problema continua? Reabrir chamado</summary>
+      <form method="post" action="{% url 'acao_chamado' chamado.id 'reabrir' %}">{% csrf_token %}{% include 'chamados/fields.html' with form=reabrir_form %}<button class="secondary-button">Reabrir com este motivo</button></form>
+    </details>{% endif %}
+  </article>
+  <aside class="panel ticket-information-panel"><h2>Atendimento</h2><dl>
+    <div><dt>Solicitante</dt><dd>{{ chamado.usuario.name }}</dd></div>
+    <div><dt>Responsável</dt><dd>{{ chamado.responsavel.name|default:'Aguardando atribuição' }}{% if chamado.responsavel and not chamado.responsavel.is_active %} (conta inativa){% endif %}</dd></div>
+    <div><dt>Urgência</dt><dd>{{ chamado.get_urgencia_display }}</dd></div>
+    <div><dt>Situação dos prazos</dt><dd class="{% if 'Atrasado' in chamado.situacao_prazo %}deadline-overdue{% endif %}">{{ chamado.situacao_prazo }}</dd></div>
+    <div><dt>Primeira resposta até</dt><dd>{{ chamado.prazo_resposta|date:'d/m/Y H:i'|default:'—' }}</dd></div>
+    {% if chamado.primeira_resposta_em %}<div><dt>Primeira resposta enviada</dt><dd>{{ chamado.primeira_resposta_em|date:'d/m/Y H:i' }}</dd></div>{% endif %}
+    <div><dt>Resolução até</dt><dd>{{ chamado.prazo_resolucao|date:'d/m/Y H:i'|default:'—' }}</dd></div>
+    <div><dt>Aberto em</dt><dd>{{ chamado.criado_em|date:'d/m/Y H:i' }}</dd></div>
+    <div><dt>Atualizado em</dt><dd>{{ chamado.atualizado_em|date:'d/m/Y H:i' }}</dd></div>
+  </dl><p class="muted">Prazos em horas corridas. Aguardando usuário pausa a contagem; ao retomar, as datas são prorrogadas pelo tempo de pausa. Aguardando terceiro não pausa.</p></aside>
+</div>
+{% if user.is_admin %}
+<section class="panel history-panel"><h2>Gerenciar atendimento</h2>
+  <details class="action-section"><summary>Alterar status e registrar solução</summary>
+    <form method="post" action="{% url 'status' chamado.id %}">{% csrf_token %}{% include 'chamados/fields.html' with form=status_form %}<button class="primary-button">Salvar status</button></form>
+  </details>
+  {% if not chamado.finalizado %}
+  <details class="action-section"><summary>Responsável, categoria, urgência e prazos</summary>
+    <p class="muted">Alterar a urgência não altera os prazos automaticamente. Para mudar um prazo, informe a justificativa. Retome a contagem antes de alterar prazos pausados.</p>
+    <form method="post" action="{% url 'acao_chamado' chamado.id 'gerenciar' %}">{% csrf_token %}{% include 'chamados/fields.html' with form=gestao_form %}<button class="primary-button">Salvar atendimento</button></form>
+  </details>{% endif %}
+  <details class="action-section"><summary>Relacionar a um incidente principal</summary>
+    {% if chamado.incidente %}<p>Incidente atual: <a class="text-link" href="{% url 'detalhe' chamado.incidente.id %}">{{ chamado.incidente.protocolo }}</a></p>{% endif %}
+    <p>Quando o incidente principal for resolvido, os chamados vinculados em aberto receberão a mesma solução e aguardarão a confirmação de cada solicitante.</p>
+    <form method="post" action="{% url 'acao_chamado' chamado.id 'vincular' %}">{% csrf_token %}{% include 'chamados/fields.html' with form=incidente_form %}<button class="secondary-button">Salvar vínculo</button></form>
+    {% for duplicado in duplicados %}<p><a class="text-link" href="{% url 'detalhe' duplicado.id %}">{{ duplicado.protocolo }} · {{ duplicado.assunto }}</a></p>{% endfor %}
+  </details>
+</section>
+{% elif chamado.incidente_id %}<p class="muted">Este atendimento está vinculado a um incidente acompanhado pela equipe.</p>{% endif %}
+<section class="panel history-panel"><h2>Anexos da abertura</h2>
+  {% for anexo in anexos %}<p><a class="text-link" href="{% url 'anexo' chamado.id anexo.id %}">{{ anexo.nome }}</a> · {{ anexo.tamanho|filesizeformat }}</p>{% empty %}<p class="muted">Nenhum anexo na abertura.</p>{% endfor %}
+</section>
+<section class="panel history-panel"><h2>Conversa e atualizações</h2>
+  <p class="muted">{{ conversa.paginator.count }} mensagens{% if user.is_admin %} · Notas internas são visíveis somente à equipe.{% endif %}</p>
+  {% for mensagem in conversa reversed %}
+  <article class="ticket-message {% if mensagem.interna %}internal-note{% elif mensagem.autor.is_admin %}ticket-message-admin{% else %}ticket-message-user{% endif %}">
+    <strong>{{ mensagem.autor.name }}</strong> <small>{{ mensagem.criado_em|date:'d/m/Y H:i' }}{% if mensagem.interna %} · NOTA INTERNA{% endif %}</small>
+    <p class="preserve-lines">{{ mensagem.conteudo }}</p>
+    {% for anexo in mensagem.anexos.all %}<p><a class="text-link" href="{% url 'anexo' chamado.id anexo.id %}">{{ anexo.nome }}</a> · {{ anexo.tamanho|filesizeformat }}</p>{% endfor %}
+  </article>{% empty %}<p class="muted">Ainda não há mensagens.</p>{% endfor %}
+  {% if conversa.has_other_pages %}<nav class="pagination" aria-label="Páginas da conversa">
+    {% if conversa.has_previous %}<a href="{% querystring mensagens=conversa.previous_page_number %}">Mais recentes</a>{% endif %}
+    <span>Página {{ conversa.number }} de {{ conversa.paginator.num_pages }}</span>
+    {% if conversa.has_next %}<a href="{% querystring mensagens=conversa.next_page_number %}">Mais antigas</a>{% endif %}
+  </nav>{% endif %}
+  {% if chamado.status != 'CLOSED' and chamado.status != 'CANCELLED' %}
+  <form method="post" enctype="multipart/form-data" class="message-form">{% csrf_token %}{% include 'chamados/fields.html' %}<button class="primary-button">Enviar mensagem</button></form>
+  {% else %}<p class="muted">Este chamado está finalizado. Para continuar um chamado encerrado, reabra-o com um motivo.</p>{% endif %}
+</section>
+<section class="panel history-panel"><h2>Histórico completo</h2>
+  {% for evento in historico %}<article class="event-item"><strong>{{ evento.campo }}{% if evento.interno %} · Interno{% endif %}</strong>
+    <p class="preserve-lines">{% if evento.anterior %}{{ evento.anterior }} → {% endif %}{{ evento.novo }}</p>
+    {% if evento.motivo %}<p class="preserve-lines">{{ evento.motivo }}</p>{% endif %}
+    <small class="muted">{{ evento.autor.name|default:'Sistema' }} · {{ evento.criado_em|date:'d/m/Y H:i' }}</small></article>
+  {% empty %}<p class="muted">Nenhuma alteração registrada.</p>{% endfor %}
+  {% if historico.has_other_pages %}<nav class="pagination" aria-label="Páginas do histórico">
+    {% if historico.has_previous %}<a href="{% querystring historico=historico.previous_page_number %}">Mais recentes</a>{% endif %}
+    <span>Página {{ historico.number }} de {{ historico.paginator.num_pages }}</span>
+    {% if historico.has_next %}<a href="{% querystring historico=historico.next_page_number %}">Mais antigas</a>{% endif %}
+  </nav>{% endif %}
+</section>
+{% endblock %}

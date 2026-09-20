@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Entrar | HelpDesk{% endblock %}
+{% block body %}
+<main class="login-layout">
+  <section class="login-showcase"><div class="login-showcase-content">
+    <div class="login-brand"><span class="brand-mark brand-mark-light">H</span><span>Help<strong>Desk</strong></span></div>
+    <div class="showcase-copy"><span class="showcase-tag">Suporte simples e transparente</span><h1>Estamos aqui para ajudar você.</h1><p>Abra solicitações, acompanhe cada atualização e encontre suas soluções em um só lugar.</p></div>
+    <div class="showcase-benefits"><div><span>✓</span><p><strong>Acompanhamento fácil</strong>Consulte seus chamados quando precisar.</p></div><div><span>✓</span><p><strong>Atendimento organizado</strong>Cada solicitação recebe um protocolo único.</p></div></div>
+  </div><p class="showcase-footer">HelpDesk acadêmico · 2026</p></section>
+  <section class="login-form-area">
+    <button class="theme-toggle login-theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">◐</button>
+    <div class="auth-card login-card"><div class="mobile-login-brand"><span class="brand-mark">H</span>HelpDesk</div><p class="eyebrow">Bem-vindo de volta</p><h2>Acesse sua conta</h2><p class="muted login-intro">Entre com as credenciais fornecidas pelo administrador.</p>
+      <form method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="id_email">E-mail<span class="input-shell"><span class="input-icon">@</span><input id="id_email" name="email" type="email" maxlength="180" value="{{ form.email.value|default:'' }}" placeholder="nome@empresa.com" autocomplete="email" required></span>{{ form.email.errors }}</label>
+        <label for="id_password">Senha<span class="input-shell"><span class="input-icon">•</span><input id="id_password" name="password" type="password" maxlength="256" placeholder="Digite sua senha" autocomplete="current-password" required><button type="button" class="password-toggle" data-password-toggle>Mostrar</button></span>{{ form.password.errors }}</label>
+        <button class="primary-button login-button" type="submit">Entrar na plataforma<span>→</span></button>
+      </form><p class="login-help">Não possui acesso? <strong>Fale com o administrador.</strong></p>
+    </div>
+  </section>
+</main>
+{% endblock %}

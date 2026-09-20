@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{% if user.is_admin %}Dashboard{% else %}Meus chamados{% endif %} | HelpDesk{% endblock %}
+{% block content %}
+<section class="dashboard-hero"><div><p class="eyebrow">{% if user.is_admin %}Administração{% else %}Portal do usuário{% endif %}</p><h1>{% if user.is_admin %}Dashboard{% else %}Olá, {{ user.name }}!{% endif %}</h1><p>{% if user.is_admin %}Acompanhe e atualize as solicitações registradas pelos usuários.{% else %}Acompanhe suas solicitações e encontre tudo o que precisa.{% endif %}</p></div><a class="primary-button" href="{% url 'novo' %}">＋ Abrir novo chamado</a></section>
+<section class="stats" aria-label="Indicadores dos chamados"><article class="stat"><span>Total</span><strong>{{ total }}</strong></article>{% for item in resumo %}<article class="stat"><span>{{ item.label }}</span><strong>{{ item.total }}</strong></article>{% endfor %}</section>
+<section class="tickets-section" id="tickets">
+  <div class="section-heading"><div><h2>{% if user.is_admin %}Chamados recebidos{% else %}Meus chamados{% endif %}</h2><p>Consulte o histórico e o andamento das solicitações.</p></div></div>
+  <form method="get" class="search-form"><label class="search-field"><span>⌕</span><input name="q" type="search" value="{{ busca }}" placeholder="Buscar por assunto ou protocolo" aria-label="Buscar chamados"></label><label class="sr-only" for="filter-status">Status</label><select id="filter-status" name="status"><option value="">Todos os status</option>{% for item in resumo %}<option value="{{ item.status }}" {% if status == item.status %}selected{% endif %}>{{ item.label }}</option>{% endfor %}</select><button class="secondary-button">Filtrar</button><a href="{% url 'inicio' %}" class="back-link">Limpar</a></form>
+  <details class="panel"><summary>Filtrar por categoria, urgência, responsável e prazo</summary>
+  <form method="get"><input type="hidden" name="q" value="{{ busca }}"><input type="hidden" name="status" value="{{ status }}">
+    <div class="advanced-filters">
+    <label>Categoria<select name="categoria"><option value="">Todas</option>{% for item in categorias %}<option value="{{ item.pk }}" {% if categoria == item.pk|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
+    <label>Urgência<select name="urgencia"><option value="">Todas</option>{% for valor, rotulo in urgencias %}<option value="{{ valor }}" {% if urgencia == valor %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></label>
+    <label>Prazo<select name="prazo"><option value="">Todos</option><option value="atrasados" {% if prazo == 'atrasados' %}selected{% endif %}>Atrasados</option><option value="proximos" {% if prazo == 'proximos' %}selected{% endif %}>Vencem em até 1 hora</option></select></label>
+    {% if user.is_admin %}<label>Fila<select name="fila"><option value="">Toda a equipe</option><option value="sem" {% if fila == 'sem' %}selected{% endif %}>Sem responsável</option></select></label>
+    <label>Meus atendimentos<select name="meus"><option value="">Todos</option><option value="1" {% if meus %}selected{% endif %}>Atribuídos a mim</option></select></label>{% endif %}
+    <label>Atualizações<select name="nao_lidas"><option value="">Todas</option><option value="1" {% if filtros.nao_lidas == '1' %}selected{% endif %}>Somente não lidas</option></select></label>
+    </div><button class="secondary-button">Aplicar filtros</button>
+  </form></details>
+  <div class="ticket-list">
+  {% for chamado in page %}
+    <div class="ticket-meta"><span>{{ chamado.categoria|default:'Outros' }}</span><span>Responsável: {{ chamado.responsavel.name|default:'Não atribuído' }}</span>
+    <span class="{% if 'Atrasado' in chamado.situacao_prazo %}deadline-overdue{% endif %}">{{ chamado.situacao_prazo }}</span>
+    {% if chamado.nao_lidas %}<span class="unread-badge">Atualizações não lidas</span>{% endif %}</div>
+    <a class="ticket-card" href="{% url 'detalhe' chamado.id %}"><div class="ticket-main"><div class="ticket-heading"><span class="protocol">{{ chamado.protocolo }}</span><span class="status-badge status-{{ chamado.status|lower }}"><span class="status-dot"></span>{{ chamado.get_status_display }}</span></div><strong class="ticket-title">{{ chamado.assunto }}</strong><p>{{ chamado.descricao|truncatechars:180 }}</p><div class="ticket-meta"><span>Aberto em {{ chamado.criado_em|date:'d/m/Y H:i' }}</span><span class="urgency urgency-{{ chamado.urgencia|lower }}">Urgência {{ chamado.get_urgencia_display|lower }}</span>{% if user.is_admin %}<span>{{ chamado.usuario.name }} · {{ chamado.usuario.email }}</span>{% endif %}</div></div><span class="ticket-arrow">›</span></a>
+  {% empty %}<div class="empty-state user-empty-state"><span class="empty-icon">▤</span><h3>Nenhum chamado encontrado</h3><p>Abra uma solicitação ou altere os filtros de busca.</p><a class="primary-button" href="{% url 'novo' %}">Abrir chamado</a></div>{% endfor %}
+  </div>{% include 'chamados/pagination.html' %}
+</section>
+{% endblock %}

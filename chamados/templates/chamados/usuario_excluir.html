@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Excluir usuário | HelpDesk{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'usuarios' %}">← Voltar aos usuários</a>
+<section class="panel form-panel">
+  <p class="eyebrow">Administração</p>
+  <h1>Excluir usuário</h1>
+  <p>Você vai excluir a conta de <strong>{{ usuario.name }}</strong> ({{ usuario.email }}).</p>
+  <p>A pessoa perderá o acesso e deixará de aparecer na lista de usuários. Chamados, mensagens, anexos e histórico de atendimento serão preservados.</p>
+  <p class="muted">O nome e o e-mail permanecem no histórico. Este e-mail continuará reservado para evitar confusão entre contas. Não há restauração pelo portal.</p>
+  <form method="post">
+    {% csrf_token %}
+    <label class="confirmation-choice"><input type="checkbox" name="confirmar" value="sim" required> Confirmo a exclusão desta conta.</label>
+    <div class="form-actions">
+      <a class="secondary-button" href="{% url 'usuarios' %}">Cancelar</a>
+      <button class="secondary-button danger-button" type="submit">Excluir usuário</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

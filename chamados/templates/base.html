@@ -1,0 +1,45 @@
+{% load static %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HelpDesk{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'chamados/style.css' %}">
+  <link rel="stylesheet" href="{% static 'chamados/django.css' %}?v=3">
+  <script src="{% static 'chamados/theme.js' %}"></script>
+  <script src="{% static 'chamados/app.js' %}?v=3" defer></script>
+</head>
+<body>
+{% block body %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'inicio' %}"><span class="brand-mark">H</span><span>Help<span class="brand-accent">Desk</span></span></a>
+    <nav class="sidebar-nav" aria-label="Navegação principal">
+      <p class="nav-section-label">Menu principal</p>
+      {% if user.is_admin %}
+      <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span>Dashboard</a>
+      <a href="{% url 'usuarios' %}" class="{% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}"><span class="nav-icon">♙</span>Usuários</a>
+      <a href="{% url 'auditoria' %}"><span class="nav-icon">◷</span>Auditoria de login</a>
+      {% else %}
+      <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><span class="nav-icon">⌂</span>Visão geral</a>
+      <a href="{% url 'home' %}#tickets"><span class="nav-icon">▤</span>Meus chamados</a>
+      {% endif %}
+      <a href="{% url 'novo' %}" class="{% if request.resolver_match.url_name == 'novo' %}active{% endif %}"><span class="nav-icon">＋</span>Abrir chamado</a>
+    </nav>
+    <a class="notification-link" href="{% url 'notificacoes' %}">Notificações <span data-notification-count>{{ notificacoes_pendentes }}</span></a>
+    <div class="support-card"><span class="support-icon">?</span><strong>Precisa de ajuda?</strong><p>Abra um chamado e nossa equipe entrará em contato.</p><a href="{% url 'novo' %}">Solicitar suporte</a></div>
+    <button type="button" class="theme-toggle theme-toggle-with-label sidebar-theme-toggle" data-theme-toggle>◐ <strong>Alternar tema</strong></button>
+    <div class="sidebar-user"><span class="user-avatar">{{ user.name|first }}</span><span class="user-summary"><strong>{{ user.name }}</strong><small>{{ user.email }}</small></span><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout-button" title="Sair" aria-label="Sair">↪</button></form></div>
+  </aside>
+  <div class="app-content">
+    <header class="mobile-topbar"><a class="brand" href="{% url 'inicio' %}"><span class="brand-mark">H</span>HelpDesk</a><div class="mobile-topbar-actions"><button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">◐</button><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout-button">Sair</button></form></div></header>
+    <nav class="mobile-nav" aria-label="Navegação móvel"><a href="{% url 'inicio' %}">Chamados</a><a href="{% url 'novo' %}">Abrir chamado</a>{% if user.is_admin %}<a href="{% url 'usuarios' %}">Usuários</a><a href="{% url 'auditoria' %}">Auditoria</a>{% endif %}</nav>
+    <div class="mobile-notifications"><a href="{% url 'notificacoes' %}">Notificações · <span data-notification-count>{{ notificacoes_pendentes }}</span> não lidas</a></div>
+    <main class="page-container">
+      {% for message in messages %}<p role="status" class="form-message {% if message.tags == 'error' %}form-message-error{% else %}form-message-success{% endif %}">{{ message }}</p>{% endfor %}
+      {% block content %}{% endblock %}
+      <footer class="page-footer">HelpDesk acadêmico · <span id="connection-status" role="status">Verificando conexão…</span></footer>
+    </main>
+  </div>
+</div>
+{% endblock %}
+</body></html>

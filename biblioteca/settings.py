@@ -1,4 +1,4 @@
-"""Configuração adaptada do projeto biblioteca fornecido em django crud.zip."""
+"""Configura banco, autenticação, páginas e armazenamento do HelpDesk."""
 import os
 import secrets
 import json
@@ -9,19 +9,21 @@ from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Arquivos locais guardam segredos; o repositório inclui somente exemplos vazios.
 load_dotenv(os.getenv('HELPDESK_ENV_FILE') or BASE_DIR / '.env')
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 if not SECRET_KEY:
     if not DEBUG:
         raise ImproperlyConfigured('Defina SECRET_KEY em produção.')
-    secret_path = BASE_DIR / '.django-secret'
+    # Preserva a chave entre reinicializações para manter as sessões locais válidas.
+    caminho_segredo = BASE_DIR / '.django-secret'
     try:
-        with secret_path.open('x', encoding='utf-8') as secret_file:
-            secret_file.write(secrets.token_urlsafe(64))
+        with caminho_segredo.open('x', encoding='utf-8') as arquivo_segredo:
+            arquivo_segredo.write(secrets.token_urlsafe(64))
     except FileExistsError:
         pass
-    SECRET_KEY = secret_path.read_text(encoding='utf-8').strip()
+    SECRET_KEY = caminho_segredo.read_text(encoding='utf-8').strip()
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
@@ -51,6 +53,7 @@ TEMPLATES = [{
 WSGI_APPLICATION = 'biblioteca.wsgi.application'
 ASGI_APPLICATION = 'biblioteca.asgi.application'
 SHARED_DATABASE = os.getenv('SHARED_DATABASE', 'False').lower() == 'true'
+# Os nomes das configurações e das variáveis de ambiente são interfaces estáveis.
 DATABASE_SCHEMA = os.getenv('DATABASE_SCHEMA', '')
 if SHARED_DATABASE and not os.getenv('DATABASE_URL'):
     raise ImproperlyConfigured('Defina DATABASE_URL para usar o banco compartilhado.')
@@ -61,6 +64,7 @@ DATABASES = {'default': dj_database_url.parse(os.getenv('DATABASE_URL') or
 if SHARED_DATABASE and DATABASES['default']['ENGINE'] != 'django.db.backends.postgresql':
     raise ImproperlyConfigured('O banco compartilhado deve usar PostgreSQL.')
 if DATABASE_SCHEMA:
+    # Um esquema exclusivo separa as tabelas do portal das APIs públicas do provedor.
     if not re.fullmatch(r'[a-z][a-z0-9_]{0,62}', DATABASE_SCHEMA) or DATABASES['default']['ENGINE'] != 'django.db.backends.postgresql':
         raise ImproperlyConfigured('DATABASE_SCHEMA deve ser um identificador PostgreSQL válido.')
     DATABASES['default'].setdefault('OPTIONS', {})['options'] = '-c search_path=' + DATABASE_SCHEMA
@@ -88,13 +92,14 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Não publicar esta pasta como /media/: o download exige autorização.
 MEDIA_ROOT = BASE_DIR / 'private_uploads'
 if os.getenv('STORAGE_S3_ENDPOINT'):
-    for field in ['STORAGE_S3_KEY', 'STORAGE_S3_SECRET', 'STORAGE_S3_REGION', 'STORAGE_S3_BUCKET']:
-        if not os.getenv(field):
-            raise ImproperlyConfigured('Configuração incompleta do armazenamento privado: ' + field)
+    # O armazenamento remoto guarda anexos privados; o portal controla o download.
+    for campo in ['STORAGE_S3_KEY', 'STORAGE_S3_SECRET', 'STORAGE_S3_REGION', 'STORAGE_S3_BUCKET']:
+        if not os.getenv(campo):
+            raise ImproperlyConfigured('Configuração incompleta do armazenamento privado: ' + campo)
     if not os.environ['STORAGE_S3_ENDPOINT'].startswith('https://'):
         raise ImproperlyConfigured('O armazenamento compartilhado exige HTTPS.')
     STORAGES = {
-        'default': {'BACKEND': 'chamados.storage.PrivateS3Storage', 'OPTIONS': {
+        'default': {'BACKEND': 'chamados.storage.ArmazenamentoPrivadoS3', 'OPTIONS': {
             'endpoint_url': os.environ['STORAGE_S3_ENDPOINT'],
             'access_key': os.environ['STORAGE_S3_KEY'],
             'secret_key': os.environ['STORAGE_S3_SECRET'],
@@ -120,10 +125,10 @@ X_FRAME_OPTIONS = 'DENY'
 JWT_EXPIRES_SECONDS = int(os.getenv('JWT_EXPIRES_SECONDS', '28800'))
 DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['chamados.authentication.BearerAuthentication'],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['chamados.authentication.AutenticacaoToken'],
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
-    'EXCEPTION_HANDLER': 'chamados.api.exception_handler',
+    'EXCEPTION_HANDLER': 'chamados.api.tratar_excecao',
 }
 
 # Horas corridas: primeira resposta, resolução. Aguardando usuário pausa a contagem.

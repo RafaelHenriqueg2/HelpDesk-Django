@@ -1,6 +1,6 @@
-{% if page.has_other_pages %}
+{% if pagina.has_other_pages %}
 <nav class="pagination" aria-label="Paginação">
-{% if page.has_previous %}<a class="secondary-button" href="{% querystring page=page.previous_page_number %}">← Anterior</a>{% endif %}
-<span>Página {{ page.number }} de {{ page.paginator.num_pages }}</span>
-{% if page.has_next %}<a class="secondary-button" href="{% querystring page=page.next_page_number %}">Próxima →</a>{% endif %}
+{% if pagina.has_previous %}<a class="secondary-button" href="{% querystring page=pagina.previous_page_number %}">← Anterior</a>{% endif %}
+<span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+{% if pagina.has_next %}<a class="secondary-button" href="{% querystring page=pagina.next_page_number %}">Próxima →</a>{% endif %}
 </nav>{% endif %}

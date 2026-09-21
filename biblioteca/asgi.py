@@ -1,10 +1,6 @@
-"""
-ASGI config for biblioteca project.
+"""Entrada ASGI para o servidor que hospeda a aplicação.
 
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/6.1/howto/deployment/asgi/
+O nome application é mantido conforme a integração com o Django e o servidor.
 """
 
 import os

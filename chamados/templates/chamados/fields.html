@@ -1,4 +1,4 @@
-{{ form.non_field_errors }}
-{% for field in form %}
-<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>{{ field }}{% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}{{ field.errors }}</div>
+{{ formulario.non_field_errors }}
+{% for campo in formulario %}
+<div class="field"><label for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>{{ campo }}{% if campo.help_text %}<small class="muted">{{ campo.help_text }}</small>{% endif %}{{ campo.errors }}</div>
 {% endfor %}

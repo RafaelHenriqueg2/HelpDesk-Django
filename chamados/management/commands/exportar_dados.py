@@ -6,11 +6,11 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
     help = 'Exporta dados para migrar a instalação. O arquivo contém dados privados.'
 
-    def add_arguments(self, parser):
-        parser.add_argument('arquivo')
+    def add_arguments(self, analisador):
+        analisador.add_argument('arquivo')
 
-    def handle(self, *args, **options):
-        destino = Path(options['arquivo']).resolve()
+    def handle(self, *args, **opcoes):
+        destino = Path(opcoes['arquivo']).resolve()
         destino.parent.mkdir(parents=True, exist_ok=True)
         try:
             with destino.open('x', encoding='utf-8') as arquivo:

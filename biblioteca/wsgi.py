@@ -1,10 +1,6 @@
-"""
-WSGI config for biblioteca project.
+"""Entrada WSGI para o servidor que hospeda a aplicação.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/6.1/howto/deployment/wsgi/
+O nome application é mantido conforme a integração com o Django e o servidor.
 """
 
 import os

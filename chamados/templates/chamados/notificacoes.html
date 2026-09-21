@@ -5,7 +5,7 @@
 <p class="muted">Ao abrir um chamado, suas notificações são marcadas como lidas.</p>
 <form method="post">{% csrf_token %}<button class="secondary-button">Marcar todas como lidas</button></form>
 <section class="panel history-panel">
-{% for item in page %}<article class="event-item">
+{% for item in pagina %}<article class="event-item">
 <a class="text-link" href="{% url 'detalhe' item.chamado.id %}">{{ item.chamado.protocolo }} · {{ item.titulo }}</a>
 {% if not item.lida_em %}<span class="unread-badge">Não lida</span>{% endif %}
 <p class="muted">{{ item.criado_em|date:'d/m/Y H:i' }}</p></article>

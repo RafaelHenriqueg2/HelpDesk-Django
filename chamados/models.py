@@ -1,3 +1,4 @@
+"""Estruturas persistidas no banco e regras simples de cada registro."""
 import uuid
 from datetime import timedelta
 from pathlib import Path
@@ -6,64 +7,70 @@ from django.db.models.functions import Lower
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
-class UsuarioManager(BaseUserManager):
+class GerenciadorUsuarios(BaseUserManager):
+    """Cria contas com e-mail normalizado e senha protegida por hash."""
+
+    # Estes nomes são pontos de integração do Django, inclusive createsuperuser.
     use_in_migrations = True
 
-    def create_user(self, email, password=None, **extra):
+    def create_user(self, email, password=None, **campos_adicionais):
         if not email:
             raise ValueError('Informe o e-mail.')
-        user = self.model(email=email.strip().lower(), **extra)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
+        usuario = self.model(email=email.strip().lower(), **campos_adicionais)
+        usuario.set_password(password)
+        usuario.save(using=self._db)
+        return usuario
 
-    def create_superuser(self, email, password=None, **extra):
-        extra.update(role='ADMIN', is_staff=True, is_superuser=True, is_active=True)
-        extra.setdefault('name', 'Administrador')
-        return self.create_user(email, password, **extra)
+    def create_superuser(self, email, password=None, **campos_adicionais):
+        campos_adicionais.update(perfil='ADMIN', is_staff=True, is_superuser=True, is_active=True)
+        campos_adicionais.setdefault('nome', 'Administrador')
+        return self.create_user(email, password, **campos_adicionais)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    class Role(models.TextChoices):
-        USER = 'USER', 'Usuário'
-        ADMIN = 'ADMIN', 'Administrador'
+    """Conta de acesso; a exclusão lógica conserva os atendimentos antigos."""
+    class Perfil(models.TextChoices):
+        USUARIO = 'USER', 'Usuário'
+        ADMINISTRADOR = 'ADMIN', 'Administrador'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField('nome', max_length=120)
+    nome = models.CharField('nome', max_length=120)
     email = models.EmailField('e-mail', max_length=180, unique=True)
-    role = models.CharField('perfil', max_length=5, choices=Role.choices, default=Role.USER)
+    perfil = models.CharField('perfil', max_length=5, choices=Perfil.choices, default=Perfil.USUARIO)
     is_active = models.BooleanField('ativo', default=True)
     is_staff = models.BooleanField('acesso ao Django Admin', default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField('excluído em', null=True, blank=True, db_index=True)
-    deleted_by = models.ForeignKey('self', verbose_name='excluído por', null=True, blank=True,
+    criado_em = models.DateTimeField(default=timezone.now)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    excluido_em = models.DateTimeField('excluído em', null=True, blank=True, db_index=True)
+    excluido_por = models.ForeignKey('self', verbose_name='excluído por', null=True, blank=True,
         on_delete=models.SET_NULL, related_name='usuarios_excluidos', editable=False)
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
-    objects = UsuarioManager()
+    REQUIRED_FIELDS = ['nome']
+    objects = GerenciadorUsuarios()
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-criado_em']
         constraints = [
             models.UniqueConstraint(Lower('email'), name='usuario_email_lower_unique'),
-            models.CheckConstraint(condition=models.Q(deleted_at__isnull=True) | models.Q(is_active=False),
+            models.CheckConstraint(condition=models.Q(excluido_em__isnull=True) | models.Q(is_active=False),
                 name='usuario_excluido_inativo'),
         ]
 
     @property
-    def is_admin(self):
-        return self.is_active and self.deleted_at is None and (self.role == self.Role.ADMIN or self.is_superuser)
+    def eh_administrador(self):
+        # A permissão considera a situação atual da conta, não apenas o perfil.
+        return self.is_active and self.excluido_em is None and (self.perfil == self.Perfil.ADMINISTRADOR or self.is_superuser)
 
     def save(self, *args, **kwargs):
         self.email = self.email.strip().lower()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name} ({self.email})'
+        return f'{self.nome} ({self.email})'
 
-class ChamadoQuerySet(models.QuerySet):
+class ConsultaChamados(models.QuerySet):
+    """Centraliza a restrição de chamados por solicitante."""
     def permitidos(self, usuario):
-        return self if usuario.is_admin else self.filter(usuario=usuario)
+        return self if usuario.eh_administrador else self.filter(usuario=usuario)
 
 
 class Categoria(models.Model):
@@ -77,20 +84,23 @@ class Categoria(models.Model):
         return self.nome
 
 class Chamado(models.Model):
-    class Status(models.TextChoices):
-        OPEN = 'OPEN', 'Aberto'
-        IN_PROGRESS = 'IN_PROGRESS', 'Em atendimento'
-        RESOLVED = 'RESOLVED', 'Resolvido'
-        WAITING_USER = 'WAITING_USER', 'Aguardando usuário'
-        WAITING_THIRD = 'WAITING_THIRD', 'Aguardando terceiro'
-        CLOSED = 'CLOSED', 'Encerrado'
-        CANCELLED = 'CANCELLED', 'Cancelado'
+    """Solicitação de suporte com responsável, situação e prazos de atendimento."""
+
+    # Os nomes Python são traduzidos; os códigos gravados e usados na API são estáveis.
+    class Situacao(models.TextChoices):
+        ABERTO = 'OPEN', 'Aberto'
+        EM_ATENDIMENTO = 'IN_PROGRESS', 'Em atendimento'
+        RESOLVIDO = 'RESOLVED', 'Resolvido'
+        AGUARDANDO_USUARIO = 'WAITING_USER', 'Aguardando usuário'
+        AGUARDANDO_TERCEIRO = 'WAITING_THIRD', 'Aguardando terceiro'
+        ENCERRADO = 'CLOSED', 'Encerrado'
+        CANCELADO = 'CANCELLED', 'Cancelado'
 
     class Urgencia(models.TextChoices):
-        LOW = 'LOW', 'Baixa'
-        MEDIUM = 'MEDIUM', 'Média'
-        HIGH = 'HIGH', 'Alta'
-        CRITICAL = 'CRITICAL', 'Crítica'
+        BAIXA = 'LOW', 'Baixa'
+        MEDIA = 'MEDIUM', 'Média'
+        ALTA = 'HIGH', 'Alta'
+        CRITICA = 'CRITICAL', 'Crítica'
 
     # O banco gera o sequencial atomicamente; não usamos count()+1.
     numero = models.BigAutoField(primary_key=True)
@@ -98,7 +108,7 @@ class Chamado(models.Model):
     assunto = models.CharField(max_length=150)
     descricao = models.TextField()
     urgencia = models.CharField(max_length=8, choices=Urgencia.choices)
-    status = models.CharField(max_length=24, choices=Status.choices, default=Status.OPEN, db_index=True)
+    status = models.CharField(max_length=24, choices=Situacao.choices, default=Situacao.ABERTO, db_index=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='chamados')
     criado_em = models.DateTimeField(default=timezone.now)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -115,7 +125,7 @@ class Chamado(models.Model):
     prazo_resolucao = models.DateTimeField(null=True, blank=True, db_index=True)
     pausa_iniciada_em = models.DateTimeField(null=True, blank=True)
     segundos_pausados = models.PositiveBigIntegerField(default=0)
-    objects = ChamadoQuerySet.as_manager()
+    objects = ConsultaChamados.as_manager()
 
     class Meta:
         ordering = ['-criado_em', '-numero']
@@ -126,17 +136,18 @@ class Chamado(models.Model):
 
     @property
     def finalizado(self):
-        return self.status in (self.Status.RESOLVED, self.Status.CLOSED, self.Status.CANCELLED)
+        return self.status in (self.Situacao.RESOLVIDO, self.Situacao.ENCERRADO, self.Situacao.CANCELADO)
 
     @property
     def situacao_prazo(self):
+        # Durante a pausa, avalia o atraso no instante em que o relógio parou.
         if self.finalizado:
             return 'Finalizado'
         agora = self.pausa_iniciada_em or timezone.now()
         prazos = [self.prazo_resolucao]
         if self.primeira_resposta_em is None:
             prazos.append(self.prazo_resposta)
-        prazos = [p for p in prazos if p is not None]
+        prazos = [prazo for prazo in prazos if prazo is not None]
         if prazos and min(prazos) < agora:
             return 'Atrasado (pausado)' if self.pausa_iniciada_em else 'Atrasado'
         if self.pausa_iniciada_em:
@@ -148,8 +159,9 @@ class Chamado(models.Model):
     def __str__(self):
         return f'{self.protocolo} — {self.assunto}'
 
-def caminho_anexo(instance, filename):
-    return f'anexos/{uuid.uuid4()}{Path(filename).suffix.lower()}'
+def caminho_anexo(instancia, nome_arquivo):
+    # Um nome aleatório evita colisões e não revela o nome original na pasta.
+    return f'anexos/{uuid.uuid4()}{Path(nome_arquivo).suffix.lower()}'
 
 class Anexo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -190,8 +202,8 @@ class RegistroLogin(models.Model):
 class HistoricoStatus(models.Model):
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE, related_name='historico')
     autor = models.ForeignKey(Usuario, on_delete=models.PROTECT)
-    anterior = models.CharField(max_length=24, choices=Chamado.Status.choices)
-    novo = models.CharField(max_length=24, choices=Chamado.Status.choices)
+    anterior = models.CharField(max_length=24, choices=Chamado.Situacao.choices)
+    novo = models.CharField(max_length=24, choices=Chamado.Situacao.choices)
     criado_em = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -199,6 +211,7 @@ class HistoricoStatus(models.Model):
 
 
 class EventoChamado(models.Model):
+    """Auditoria das alterações; eventos internos são visíveis somente à equipe."""
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE, related_name='eventos')
     autor = models.ForeignKey(Usuario, null=True, on_delete=models.PROTECT)
     campo = models.CharField(max_length=40)
@@ -213,6 +226,7 @@ class EventoChamado(models.Model):
 
 
 class Notificacao(models.Model):
+    """Aviso por destinatário, com leitura independente de outros usuários."""
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='notificacoes')
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE, related_name='notificacoes')
     titulo = models.CharField(max_length=200)
@@ -223,3 +237,6 @@ class Notificacao(models.Model):
     class Meta:
         ordering = ['-criado_em', '-pk']
         indexes = [models.Index(fields=['usuario', 'lida_em', 'chamado'])]
+
+# O nome antigo permanece somente para carregar a migration 0001 já distribuída.
+UsuarioManager = GerenciadorUsuarios

@@ -1,12 +1,16 @@
 # HelpDesk em Django
 
+## Código em português e comentado
+
+Classes, variáveis e campos próprios usam nomes em português. Consulte o [guia de leitura do código](docs/CODIGO_COMENTADO.md). A migration 0005 preserva os dados ao renomear os campos de usuários.
+
 ## Atualização: atendimento completo e banco compartilhado
 
 Foram adicionados responsável, categorias, novos estados, confirmação/reabertura, prazos, notas internas, múltiplos anexos, notificações no portal, incidentes relacionados e histórico completo. Veja [o guia de atendimento](docs/ATENDIMENTO.md).
 
 O projeto está preparado para PostgreSQL/Supabase e armazenamento privado de anexos. A conexão com a sua conta ainda precisa ser configurada: [passo a passo](docs/SUPABASE.md). O ambiente atual continua local.
 
-A suite atual tem **67 testes**, executados com SQLite e PostgreSQL 18 local. As listagens da API agora retornam um objeto paginado com `results`; veja as alterações de contrato em [ATENDIMENTO.md](docs/ATENDIMENTO.md).
+A suite atual tem **73 testes**, executados com SQLite e PostgreSQL 18 local. As listagens da API agora retornam um objeto paginado com `results`; veja as alterações de contrato em [ATENDIMENTO.md](docs/ATENDIMENTO.md).
 
 Conversão do projeto [samuelcorazzi/HelpDesk](https://github.com/samuelcorazzi/HelpDesk), usando o **`django crud.zip` fornecido como base estrutural**.
 
@@ -184,7 +188,7 @@ Foram executados **67 testes automatizados**, com SQLite e PostgreSQL local, cob
 
 Na página Usuários, clique em Excluir e confirme a conta selecionada. A exclusão remove a conta das listas do portal/API, desativa o acesso e inutiliza a senha; sessões e tokens anteriores deixam de autenticar. Chamados, anexos, mensagens, identificação do autor e auditoria permanecem disponíveis.
 
-O administrador não pode excluir a própria conta. Contas com acesso técnico (staff/superusuário) só podem ser excluídas por outro superusuário. A data e o responsável ficam registrados em `deleted_at` e `deleted_by`, visíveis na administração técnica. Contas excluídas são somente leitura nessa área, e a exclusão física por Django Admin está desabilitada.
+O administrador não pode excluir a própria conta. Contas com acesso técnico (staff/superusuário) só podem ser excluídas por outro superusuário. A data e o responsável ficam registrados em `excluido_em` e `excluido_por`, visíveis na administração técnica. Contas excluídas são somente leitura nessa área, e a exclusão física por Django Admin está desabilitada.
 
 O e-mail permanece reservado; esta operação não anonimiza dados e não oferece restauração pelo portal. A migration `0002_exclusao_logica_usuario` atualiza instalações existentes sem excluir seus registros.
 

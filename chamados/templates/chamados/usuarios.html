@@ -23,14 +23,14 @@
     <div class="table-scroll"><table>
       <thead><tr><th>Nome / E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
       <tbody>
-        {% for usuario in page %}
+        {% for usuario in pagina %}
         <tr>
-          <td><a class="text-link" href="{% url 'usuario' usuario.id %}"><strong>{{ usuario.name }}</strong><br><small>{{ usuario.email }}</small></a></td>
-          <td>{{ usuario.get_role_display }}</td>
+          <td><a class="text-link" href="{% url 'usuario' usuario.id %}"><strong>{{ usuario.nome }}</strong><br><small>{{ usuario.email }}</small></a></td>
+          <td>{{ usuario.get_perfil_display }}</td>
           <td>{{ usuario.is_active|yesno:'Ativo,Desativado' }}</td>
           <td>
             {% if usuario.pode_excluir %}
-            <a class="danger-link" href="{% url 'usuario_excluir' usuario.id %}" aria-label="Excluir {{ usuario.name }}">Excluir</a>
+            <a class="danger-link" href="{% url 'usuario_excluir' usuario.id %}" aria-label="Excluir {{ usuario.nome }}">Excluir</a>
             {% elif usuario.id == user.id %}
             <span class="muted">Sua conta</span>
             {% else %}

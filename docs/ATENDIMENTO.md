@@ -53,4 +53,4 @@ Novos endpoints:
 GET /api/chamados aceita status, urgencia e meus=1. O detalhe devolve as últimas 30 mensagens visíveis e mensagensTotal; para as demais, use o endpoint paginado de mensagens. Os downloads continuam passando por autorização no Django.
 
 ## Validação
-67 testes passaram em SQLite e em uma instância PostgreSQL 18 isolada. Foram cobertos atribuição, permissões, pausas, prazos, confirmação/reabertura, cancelamento, privacidade das notas/anexos, múltiplos uploads, rollback, notificações, duplicados, paginação e os fluxos anteriores.
+73 testes passaram em SQLite e em uma instância PostgreSQL 18 isolada. Foram cobertos atribuição, permissões, pausas, prazos, confirmação/reabertura, cancelamento, privacidade das notas/anexos, múltiplos uploads, rollback, notificações, duplicados, paginação e os fluxos anteriores.

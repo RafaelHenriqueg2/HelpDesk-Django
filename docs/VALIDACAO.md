@@ -1,5 +1,14 @@
 # Validação da entrega
 
+## Identificadores em português e comentários — 20/09/2026
+
+- 73 testes passaram em SQLite e PostgreSQL 18 isolado.
+- Cobertura adicional: cadastro e login em português, entradas antigas, paginação HTML, comando createsuperuser e migração reversível preservando contas excluídas e vínculos.
+- A migration 0005 foi aplicada localmente após backup; todos os registros de todas as tabelas existentes foram comparados antes/depois e preservados.
+- Exportação/importação entre bancos PostgreSQL isolados novamente validada.
+- Portal conferido no navegador: sessão existente, nomes, perfis e campos traduzidos.
+- Rotas e chaves JSON da API permanecem compatíveis; as novas exportações JSON usam os campos internos traduzidos.
+
 ## Evolução de atendimento e preparação para Supabase — 20/09/2026
 
 - 67 testes passaram em SQLite e PostgreSQL 18 isolado, incluindo os testes anteriores.

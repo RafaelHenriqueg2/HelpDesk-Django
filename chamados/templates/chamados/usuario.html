@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}{{ usuario.name }} | HelpDesk{% endblock %}
+{% block title %}{{ usuario.nome }} | HelpDesk{% endblock %}
 {% block content %}
 <a class="back-link" href="{% url 'usuarios' %}">← Voltar aos usuários</a>
 <section class="panel ticket-information-panel">
-  <h1>{{ usuario.name }}</h1>
+  <h1>{{ usuario.nome }}</h1>
   <dl>
     <div><dt>E-mail</dt><dd>{{ usuario.email }}</dd></div>
-    <div><dt>Perfil</dt><dd>{{ usuario.get_role_display }}</dd></div>
+    <div><dt>Perfil</dt><dd>{{ usuario.get_perfil_display }}</dd></div>
     <div><dt>Situação</dt><dd>{{ usuario.is_active|yesno:'Ativo,Desativado' }}</dd></div>
-    <div><dt>Cadastrado em</dt><dd>{{ usuario.created_at|date:'d/m/Y H:i' }}</dd></div>
+    <div><dt>Cadastrado em</dt><dd>{{ usuario.criado_em|date:'d/m/Y H:i' }}</dd></div>
   </dl>
   {% if pode_excluir %}
   <a class="secondary-button danger-button" href="{% url 'usuario_excluir' usuario.id %}">Excluir usuário</a>

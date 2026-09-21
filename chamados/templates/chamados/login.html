@@ -11,9 +11,9 @@
     <button class="theme-toggle login-theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">◐</button>
     <div class="auth-card login-card"><div class="mobile-login-brand"><span class="brand-mark">H</span>HelpDesk</div><p class="eyebrow">Bem-vindo de volta</p><h2>Acesse sua conta</h2><p class="muted login-intro">Entre com as credenciais fornecidas pelo administrador.</p>
       <form method="post">{% csrf_token %}
-        {{ form.non_field_errors }}
-        <label for="id_email">E-mail<span class="input-shell"><span class="input-icon">@</span><input id="id_email" name="email" type="email" maxlength="180" value="{{ form.email.value|default:'' }}" placeholder="nome@empresa.com" autocomplete="email" required></span>{{ form.email.errors }}</label>
-        <label for="id_password">Senha<span class="input-shell"><span class="input-icon">•</span><input id="id_password" name="password" type="password" maxlength="256" placeholder="Digite sua senha" autocomplete="current-password" required><button type="button" class="password-toggle" data-password-toggle>Mostrar</button></span>{{ form.password.errors }}</label>
+        {{ formulario.non_field_errors }}
+        <label for="id_email">E-mail<span class="input-shell"><span class="input-icon">@</span><input id="id_email" name="email" type="email" maxlength="180" value="{{ formulario.email.value|default:'' }}" placeholder="nome@empresa.com" autocomplete="email" required></span>{{ formulario.email.errors }}</label>
+        <label for="id_senha">Senha<span class="input-shell"><span class="input-icon">•</span><input id="id_senha" name="senha" type="password" maxlength="256" placeholder="Digite sua senha" autocomplete="current-password" required><button type="button" class="password-toggle" data-password-toggle>Mostrar</button></span>{{ formulario.senha.errors }}</label>
         <button class="primary-button login-button" type="submit">Entrar na plataforma<span>→</span></button>
       </form><p class="login-help">Não possui acesso? <strong>Fale com o administrador.</strong></p>
     </div>

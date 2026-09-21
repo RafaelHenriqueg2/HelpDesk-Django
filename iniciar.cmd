@@ -16,7 +16,7 @@ if not exist ".env" copy /y ".env.example" ".env" >nul
 if errorlevel 1 goto erro
 ".venv\Scripts\python.exe" manage.py check
 if errorlevel 1 goto erro
-".venv\Scripts\python.exe" manage.py shell -c "from chamados.models import Usuario; raise SystemExit(0 if Usuario.objects.filter(role='ADMIN', is_active=True).exists() else 1)"
+".venv\Scripts\python.exe" manage.py shell -c "from chamados.models import Usuario; raise SystemExit(0 if Usuario.objects.filter(perfil='ADMIN', is_active=True).exists() else 1)"
 if errorlevel 1 (
   echo Vamos criar seu primeiro administrador.
   ".venv\Scripts\python.exe" manage.py criar_admin

@@ -19,4 +19,4 @@ class Command(BaseCommand):
         # Apenas as categorias sem vínculos criadas pela migration inicial.
         Categoria.objects.all().delete()
         call_command('loaddata', opcoes['arquivo'], verbosity=0)
-        self.stdout.write(self.style.SUCCESS('Dados importados. Os anexos precisam ser copiados separadamente.'))
+        self.stdout.write(self.style.SUCCESS('Dados importados, incluindo os anexos armazenados no banco.'))

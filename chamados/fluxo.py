@@ -1,9 +1,10 @@
 """Fluxos de atendimento usados pelo portal e pela API."""
+import base64
 from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import (Usuario, Chamado, Categoria, Anexo, MensagemChamado,
@@ -53,13 +54,16 @@ def retomar_prazos(chamado, agora):
 
 
 def mensagens_visiveis(chamado, usuario):
-    consulta = chamado.mensagens.select_related('autor').prefetch_related('anexos')
+    consulta = chamado.mensagens.select_related('autor').prefetch_related(
+        Prefetch('anexos', queryset=Anexo.objects.defer('conteudo_base64')))
     return consulta if usuario.eh_administrador else consulta.filter(interna=False)
 
 
-def anexos_visiveis(chamado, usuario):
+def anexos_visiveis(chamado, usuario, incluir_conteudo=False):
     # O arquivo herda a privacidade da mensagem à qual pertence.
     consulta = chamado.anexos.select_related('mensagem')
+    if not incluir_conteudo:
+        consulta = consulta.defer('conteudo_base64')
     return consulta if usuario.eh_administrador else consulta.filter(Q(mensagem__isnull=True) | Q(mensagem__interna=False))
 
 
@@ -86,41 +90,29 @@ def validar_arquivos(arquivos):
     return arquivos
 
 
-def guardar_arquivos(chamado, arquivos, salvos, mensagem=None):
+def guardar_arquivos(chamado, arquivos, mensagem=None):
     for arquivo in arquivos:
-        anexo = Anexo(chamado=chamado, mensagem=mensagem, nome=arquivo.name[:255],
-            tipo=arquivo.content_type, tamanho=arquivo.size)
-        anexo.arquivo.save(arquivo.name, arquivo, save=False)
-        salvos.append(anexo)
-        anexo.save()
-
-
-def limpar_arquivos(salvos):
-    for anexo in salvos:
-        anexo.arquivo.delete(save=False)
+        arquivo.seek(0)
+        Anexo.objects.create(chamado=chamado, mensagem=mensagem,
+            nome=arquivo.name[:255], tipo=arquivo.content_type, tamanho=arquivo.size,
+            conteudo_base64=base64.b64encode(arquivo.read()).decode('ascii'))
 
 
 def criar(usuario, dados):
     """Grava o chamado, os anexos e os avisos como uma única operação lógica."""
     arquivos = validar_arquivos(dados.get('anexo'))
-    salvos = []
-    try:
-        with transaction.atomic():
-            categoria = dados.get('categoria') or Categoria.objects.get_or_create(nome='Outros')[0]
-            if not categoria.ativa:
-                raise ValidationError('Categoria indisponível.')
-            chamado = Chamado(usuario=usuario, assunto=dados['assunto'],
-                descricao=dados['descricao'], urgencia=dados['urgencia'], categoria=categoria)
-            definir_prazos(chamado)
-            chamado.save()
-            guardar_arquivos(chamado, arquivos, salvos)
-            evento(chamado, usuario, 'Abertura', novo='Chamado aberto')
-            notificar(chamado, usuario, 'Novo chamado')
-            return chamado
-    except Exception:
-        # A transação desfaz o banco, mas o armazenamento precisa de limpeza própria.
-        limpar_arquivos(salvos)
-        raise
+    with transaction.atomic():
+        categoria = dados.get('categoria') or Categoria.objects.get_or_create(nome='Outros')[0]
+        if not categoria.ativa:
+            raise ValidationError('Categoria indisponível.')
+        chamado = Chamado(usuario=usuario, assunto=dados['assunto'],
+            descricao=dados['descricao'], urgencia=dados['urgencia'], categoria=categoria)
+        definir_prazos(chamado)
+        chamado.save()
+        guardar_arquivos(chamado, arquivos)
+        evento(chamado, usuario, 'Abertura', novo='Chamado aberto')
+        notificar(chamado, usuario, 'Novo chamado')
+        return chamado
 
 
 def _mudar_status(chamado, autor, novo, motivo='', solucao=''):
@@ -221,27 +213,22 @@ def mensagem(usuario, id, conteudo, interna=False, arquivos=None):
     arquivos = validar_arquivos(arquivos)
     if not conteudo.strip() or len(conteudo) > 2000:
         raise ValidationError('Escreva uma mensagem de até 2000 caracteres.')
-    salvos = []
-    try:
-        with transaction.atomic():
-            chamado = get_object_or_404(Chamado.objects.permitidos(usuario).select_for_update(), id=id)
-            if chamado.status in (Chamado.Situacao.ENCERRADO, Chamado.Situacao.CANCELADO):
-                raise ValidationError('Reabra o chamado antes de enviar uma mensagem.')
-            mensagem_criada = MensagemChamado.objects.create(chamado=chamado, autor=usuario,
-                conteudo=conteudo, interna=interna)
-            guardar_arquivos(chamado, arquivos, salvos, mensagem_criada)
-            if usuario.eh_administrador and usuario.pk != chamado.usuario_id and not interna and chamado.primeira_resposta_em is None:
-                chamado.primeira_resposta_em = timezone.now()
-            if usuario.pk == chamado.usuario_id and not interna and chamado.status == Chamado.Situacao.AGUARDANDO_USUARIO:
-                _mudar_status(chamado, usuario, Chamado.Situacao.EM_ATENDIMENTO, 'Solicitante respondeu.')
-            chamado.save()
-            evento(chamado, usuario, 'Nota interna' if interna else 'Mensagem',
-                novo='Mensagem enviada' + (f' com {len(arquivos)} anexo(s)' if arquivos else ''), interno=interna)
-            notificar(chamado, usuario, 'Nova nota interna' if interna else 'Nova mensagem', interna=interna)
-            return mensagem_criada
-    except Exception:
-        limpar_arquivos(salvos)
-        raise
+    with transaction.atomic():
+        chamado = get_object_or_404(Chamado.objects.permitidos(usuario).select_for_update(), id=id)
+        if chamado.status in (Chamado.Situacao.ENCERRADO, Chamado.Situacao.CANCELADO):
+            raise ValidationError('Reabra o chamado antes de enviar uma mensagem.')
+        mensagem_criada = MensagemChamado.objects.create(chamado=chamado, autor=usuario,
+            conteudo=conteudo, interna=interna)
+        guardar_arquivos(chamado, arquivos, mensagem_criada)
+        if usuario.eh_administrador and usuario.pk != chamado.usuario_id and not interna and chamado.primeira_resposta_em is None:
+            chamado.primeira_resposta_em = timezone.now()
+        if usuario.pk == chamado.usuario_id and not interna and chamado.status == Chamado.Situacao.AGUARDANDO_USUARIO:
+            _mudar_status(chamado, usuario, Chamado.Situacao.EM_ATENDIMENTO, 'Solicitante respondeu.')
+        chamado.save()
+        evento(chamado, usuario, 'Nota interna' if interna else 'Mensagem',
+            novo='Mensagem enviada' + (f' com {len(arquivos)} anexo(s)' if arquivos else ''), interno=interna)
+        notificar(chamado, usuario, 'Nova nota interna' if interna else 'Nova mensagem', interna=interna)
+        return mensagem_criada
 
 
 @transaction.atomic

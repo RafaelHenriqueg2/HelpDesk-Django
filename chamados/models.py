@@ -166,7 +166,9 @@ def caminho_anexo(instancia, nome_arquivo):
 class Anexo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE, related_name='anexos')
-    arquivo = models.FileField(upload_to=caminho_anexo)
+    # O conteúdo fica no próprio banco. Base64 permite exportar e restaurar o
+    # registro completo sem depender de uma pasta ou serviço de arquivos.
+    conteudo_base64 = models.TextField(editable=False)
     nome = models.CharField(max_length=255)
     tipo = models.CharField(max_length=120)
     tamanho = models.PositiveIntegerField()

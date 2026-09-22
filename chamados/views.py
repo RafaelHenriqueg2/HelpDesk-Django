@@ -64,6 +64,9 @@ def painel(requisicao):
     chamados = services.consultar(requisicao.user)
     contagem = dict(chamados.order_by().values('status').annotate(total=Count('numero')).values_list('status', 'total'))
     resumo = [{'status': codigo, 'rotulo': rotulo, 'total': contagem.get(codigo, 0)} for codigo, rotulo in Chamado.Situacao.choices]
+    resumo_destaque = resumo if requisicao.user.eh_administrador else [
+        item for item in resumo if item['status'] in (
+            Chamado.Situacao.ABERTO, Chamado.Situacao.EM_ATENDIMENTO, Chamado.Situacao.RESOLVIDO)]
     busca = requisicao.GET.get('q', '').strip()
     status = requisicao.GET.get('status', '')
     categoria = requisicao.GET.get('categoria', '')
@@ -105,7 +108,8 @@ def painel(requisicao):
             filtro |= Q(usuario__nome__icontains=busca) | Q(usuario__email__icontains=busca)
         chamados = chamados.filter(filtro)
     return render(requisicao, 'chamados/lista.html', {'pagina': Paginator(chamados, 20).get_page(requisicao.GET.get('page')),
-        'resumo': resumo, 'total': sum(contagem.values()), 'busca': busca, 'status': status,
+        'resumo': resumo, 'resumo_destaque': resumo_destaque,
+        'total': sum(contagem.values()), 'busca': busca, 'status': status,
         'categorias': Categoria.objects.filter(ativa=True), 'categoria': categoria,
         'urgencias': Chamado.Urgencia.choices, 'urgencia': urgencia, 'meus': meus,
         'fila': fila, 'prazo': prazo, 'filtros': requisicao.GET})

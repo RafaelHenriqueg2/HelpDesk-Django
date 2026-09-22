@@ -1,4 +1,7 @@
 """Regras compartilhadas pelas views HTML e pela API."""
+import base64
+import binascii
+from io import BytesIO
 from django.contrib.auth import authenticate
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
@@ -77,11 +80,13 @@ def enviar_mensagem(usuario, id, conteudo, interna=False, anexo=None):
 def baixar_anexo(usuario, id, anexo_id):
     """Entrega o arquivo somente depois de conferir acesso ao chamado e à nota."""
     chamado = buscar(usuario, id)
-    anexo = get_object_or_404(fluxo.anexos_visiveis(chamado, usuario), pk=anexo_id)
+    anexo = get_object_or_404(
+        fluxo.anexos_visiveis(chamado, usuario, incluir_conteudo=True), pk=anexo_id)
     try:
-        arquivo = anexo.arquivo.open('rb')
-    except FileNotFoundError:
+        conteudo = base64.b64decode(anexo.conteudo_base64, validate=True)
+    except (binascii.Error, ValueError):
         raise Http404('Arquivo não encontrado.')
-    resposta = FileResponse(arquivo, as_attachment=True, filename=anexo.nome, content_type=anexo.tipo)
+    resposta = FileResponse(BytesIO(conteudo), as_attachment=True,
+        filename=anexo.nome, content_type=anexo.tipo)
     resposta['Cache-Control'] = 'private, no-store'
     return resposta

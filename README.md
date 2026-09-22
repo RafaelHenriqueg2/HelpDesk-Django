@@ -2,15 +2,15 @@
 
 ## Código em português e comentado
 
-Classes, variáveis e campos próprios usam nomes em português. Consulte o [guia de leitura do código](docs/CODIGO_COMENTADO.md). A migration 0005 preserva os dados ao renomear os campos de usuários.
+Classes, variáveis e campos próprios usam nomes em português. A migration 0005 preserva os dados ao renomear os campos de usuários.
 
 ## Atualização: atendimento completo e banco compartilhado
 
-Foram adicionados responsável, categorias, novos estados, confirmação/reabertura, prazos, notas internas, múltiplos anexos, notificações no portal, incidentes relacionados e histórico completo. Veja [o guia de atendimento](docs/ATENDIMENTO.md).
+Foram adicionados responsável, categorias, novos estados, confirmação/reabertura, prazos, notas internas, múltiplos anexos, notificações no portal, incidentes relacionados e histórico completo.
 
-O projeto integra PostgreSQL/Supabase e armazenamento privado de anexos. Para conectar outra máquina à integração existente, configure as credenciais locais conforme o [passo a passo](docs/SUPABASE.md).
+O projeto integra PostgreSQL/Supabase e armazenamento privado de anexos. Para conectar outra máquina à integração existente, configure as credenciais locais no arquivo `.env.supabase`.
 
-A suíte atual tem **73 testes**. A limpeza do código foi validada com SQLite e as dependências de armazenamento instaladas; o histórico de validações está em [VALIDACAO.md](docs/VALIDACAO.md). As listagens da API retornam um objeto paginado com `results`; veja [ATENDIMENTO.md](docs/ATENDIMENTO.md).
+As listagens da API retornam um objeto paginado com `results`.
 
 Conversão do projeto [samuelcorazzi/HelpDesk](https://github.com/samuelcorazzi/HelpDesk), usando o **`django crud.zip` fornecido como base estrutural**.
 
@@ -121,11 +121,6 @@ HelpDesk-Django/
 │   ├── management/commands/  # criar_admin, preparar_demo
 │   ├── templates/            # base, login, dashboard, detalhes, usuários
 │   ├── static/chamados/      # CSS original e adaptações Django
-│   └── tests.py
-├── docs/
-│   ├── MIGRACAO.md           # Correspondência entre os dois projetos
-│   ├── API.md                # Contratos e exemplos
-│   └── VALIDACAO.md
 ├── requirements.txt
 ├── requirements-lock.txt    # Versões usadas nos testes em Windows/Python 3.14
 └── iniciar.cmd
@@ -161,7 +156,7 @@ A conexão com o Supabase depende das credenciais configuradas em cada máquina.
 - O download exige que a conta seja dona do chamado ou administradora.
 - Se a gravação do banco falhar, o arquivo recém-gravado é removido.
 
-O projeto suporta armazenamento local privado e Supabase Storage via S3. Para compartilhar anexos entre máquinas, use o mesmo bucket privado e as configurações descritas em [SUPABASE.md](docs/SUPABASE.md).
+O projeto suporta armazenamento local privado e Supabase Storage via S3. Para compartilhar anexos entre máquinas, use o mesmo bucket privado e preencha as variáveis `STORAGE_S3_*` no `.env.supabase`.
 
 ## Autenticação e segurança
 
@@ -176,10 +171,9 @@ O segredo de desenvolvimento é gerado em `.django-secret` e ignorado pelo Git. 
 ```powershell
 .\.venv\Scripts\python.exe manage.py check
 .\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run
-.\.venv\Scripts\python.exe manage.py test chamados
 ```
 
-Os **73 testes automatizados** cobrem autenticação, autorização, chamados, anexos, mensagens, exclusão de contas, migrações e fluxos de atendimento. Eles não são executados ao iniciar o servidor. Veja [a revisão da limpeza e das dependências](docs/LIMPEZA.md).
+As verificações disponíveis são `manage.py check` e `makemigrations --check --dry-run`.
 
 ### Exclusão de usuários
 

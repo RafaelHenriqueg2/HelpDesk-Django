@@ -4,6 +4,8 @@ __pycache__/
 .env
 .env.local
 .env.supabase
+.env.example
+.env.supabase.example
 *.backup.json
 backups/
 .django-secret

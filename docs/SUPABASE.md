@@ -21,7 +21,7 @@ Referências: [conexão PostgreSQL](https://supabase.com/docs/guides/database/co
 Na pasta do projeto:
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-cloud.txt
-Copy-Item .env.supabase.example .env.supabase
+New-Item .env.supabase -ItemType File
 code .env.supabase
 ```
 

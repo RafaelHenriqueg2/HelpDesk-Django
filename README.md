@@ -35,7 +35,6 @@ No PowerShell, dentro da pasta do projeto:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-Copy-Item .env.example .env
 .\.venv\Scripts\python.exe manage.py migrate
 .\.venv\Scripts\python.exe manage.py criar_admin
 .\.venv\Scripts\python.exe manage.py runserver
@@ -43,7 +42,7 @@ Copy-Item .env.example .env
 
 Não é necessário ativar o ambiente virtual, evitando problemas com a política de execução do PowerShell.
 
-Em Linux/macOS, substitua `.\.venv\Scripts\python.exe` por `.venv/bin/python` e use `cp .env.example .env`.
+Em Linux/macOS, substitua `.\.venv\Scripts\python.exe` por `.venv/bin/python`.
 
 ### Demonstração para apresentação
 
@@ -127,7 +126,6 @@ HelpDesk-Django/
 │   ├── MIGRACAO.md           # Correspondência entre os dois projetos
 │   ├── API.md                # Contratos e exemplos
 │   └── VALIDACAO.md
-├── .env.example
 ├── requirements.txt
 ├── requirements-lock.txt    # Versões usadas nos testes em Windows/Python 3.14
 └── iniciar.cmd

@@ -11,7 +11,6 @@ if not exist ".venv\Scripts\python.exe" python -m venv .venv
 if errorlevel 1 goto erro
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 goto erro
-if not exist ".env" copy /y ".env.example" ".env" >nul
 ".venv\Scripts\python.exe" manage.py migrate
 if errorlevel 1 goto erro
 ".venv\Scripts\python.exe" manage.py check

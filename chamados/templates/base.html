@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}HelpDesk{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'chamados/favicon.svg' %}">
   <link rel="stylesheet" href="{% static 'chamados/style.css' %}">
   <link rel="stylesheet" href="{% static 'chamados/django.css' %}?v=4">
   {% if request.resolver_match.url_name != 'login' %}<link rel="stylesheet" href="{% static 'chamados/portal.css' %}?v=1">{% endif %}

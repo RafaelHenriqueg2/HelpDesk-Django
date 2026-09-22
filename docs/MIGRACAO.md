@@ -40,7 +40,7 @@ O app de exemplo `livros` foi substituído por `chamados`. Seu banco, bytecode e
 | ConnectionStatus | `/api/status` e indicador em `app.js` |
 | `ticket-utils.ts` | Propriedade `protocolo`, choices e filtros de data Django |
 | `globals.css` | Copiado para `static/chamados/style.css` |
-| `iniciar.cmd` / `parar.cmd` | Scripts para um servidor Django |
+| `iniciar.cmd` | Inicializa o servidor Django; Ctrl+C encerra na mesma janela |
 
 ## Decisões de adaptação
 

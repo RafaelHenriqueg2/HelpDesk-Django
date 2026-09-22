@@ -7,6 +7,7 @@
   <span class="status-badge status-{{ chamado.status|lower }}">{{ chamado.get_status_display }}</span>
 </section>
 <div class="ticket-detail-layout">
+<div class="detail-main">
   <article class="panel"><h2>Descrição</h2><p class="preserve-lines">{{ chamado.descricao }}</p>
     {% if chamado.solucao %}<div class="solution-box"><h2>Solução registrada</h2><p class="preserve-lines">{{ chamado.solucao }}</p>
     {% if chamado.confirmado_em %}<p>Confirmada em {{ chamado.confirmado_em|date:'d/m/Y H:i' }}.</p>{% endif %}
@@ -15,18 +16,6 @@
       <form method="post" action="{% url 'acao_chamado' chamado.id 'reabrir' %}">{% csrf_token %}{% include 'chamados/fields.html' with formulario=formulario_reabertura %}<button class="secondary-button">Reabrir com este motivo</button></form>
     </details>{% endif %}
   </article>
-  <aside class="panel ticket-information-panel"><h2>Atendimento</h2><dl>
-    <div><dt>Solicitante</dt><dd>{{ chamado.usuario.nome }}</dd></div>
-    <div><dt>Responsável</dt><dd>{{ chamado.responsavel.nome|default:'Aguardando atribuição' }}{% if chamado.responsavel and not chamado.responsavel.is_active %} (conta inativa){% endif %}</dd></div>
-    <div><dt>Urgência</dt><dd>{{ chamado.get_urgencia_display }}</dd></div>
-    <div><dt>Situação dos prazos</dt><dd class="{% if 'Atrasado' in chamado.situacao_prazo %}deadline-overdue{% endif %}">{{ chamado.situacao_prazo }}</dd></div>
-    <div><dt>Primeira resposta até</dt><dd>{{ chamado.prazo_resposta|date:'d/m/Y H:i'|default:'—' }}</dd></div>
-    {% if chamado.primeira_resposta_em %}<div><dt>Primeira resposta enviada</dt><dd>{{ chamado.primeira_resposta_em|date:'d/m/Y H:i' }}</dd></div>{% endif %}
-    <div><dt>Resolução até</dt><dd>{{ chamado.prazo_resolucao|date:'d/m/Y H:i'|default:'—' }}</dd></div>
-    <div><dt>Aberto em</dt><dd>{{ chamado.criado_em|date:'d/m/Y H:i' }}</dd></div>
-    <div><dt>Atualizado em</dt><dd>{{ chamado.atualizado_em|date:'d/m/Y H:i' }}</dd></div>
-  </dl><p class="muted">Prazos em horas corridas. Aguardando usuário pausa a contagem; ao retomar, as datas são prorrogadas pelo tempo de pausa. Aguardando terceiro não pausa.</p></aside>
-</div>
 {% if user.eh_administrador %}
 <section class="panel history-panel"><h2>Gerenciar atendimento</h2>
   <details class="action-section"><summary>Alterar status e registrar solução</summary>
@@ -49,7 +38,7 @@
   {% for anexo in anexos %}<p><a class="text-link" href="{% url 'anexo' chamado.id anexo.id %}">{{ anexo.nome }}</a> · {{ anexo.tamanho|filesizeformat }}</p>{% empty %}<p class="muted">Nenhum anexo na abertura.</p>{% endfor %}
 </section>
 <section class="panel history-panel"><h2>Conversa e atualizações</h2>
-  <p class="muted">{{ conversa.paginator.count }} mensagens{% if user.eh_administrador %} · Notas internas são visíveis somente à equipe.{% endif %}</p>
+  <p class="muted">{{ conversa.paginator.count }} mensage{{ conversa.paginator.count|pluralize:'m,ns' }}{% if user.eh_administrador %} · Notas internas são visíveis somente à equipe.{% endif %}</p>
   {% for mensagem in conversa reversed %}
   <article class="ticket-message {% if mensagem.interna %}internal-note{% elif mensagem.autor.eh_administrador %}ticket-message-admin{% else %}ticket-message-user{% endif %}">
     <strong>{{ mensagem.autor.nome }}</strong> <small>{{ mensagem.criado_em|date:'d/m/Y H:i' }}{% if mensagem.interna %} · NOTA INTERNA{% endif %}</small>
@@ -77,4 +66,17 @@
     {% if historico.has_next %}<a href="{% querystring historico=historico.next_page_number %}">Mais antigas</a>{% endif %}
   </nav>{% endif %}
 </section>
+</div>
+  <aside class="panel ticket-information-panel"><h2>Atendimento</h2><dl>
+    <div><dt>Solicitante</dt><dd>{{ chamado.usuario.nome }}</dd></div>
+    <div><dt>Responsável</dt><dd>{{ chamado.responsavel.nome|default:'Aguardando atribuição' }}{% if chamado.responsavel and not chamado.responsavel.is_active %} (conta inativa){% endif %}</dd></div>
+    <div><dt>Urgência</dt><dd>{{ chamado.get_urgencia_display }}</dd></div>
+    <div><dt>Situação dos prazos</dt><dd class="{% if 'Atrasado' in chamado.situacao_prazo %}deadline-overdue{% endif %}">{{ chamado.situacao_prazo }}</dd></div>
+    <div><dt>Primeira resposta até</dt><dd>{{ chamado.prazo_resposta|date:'d/m/Y H:i'|default:'—' }}</dd></div>
+    {% if chamado.primeira_resposta_em %}<div><dt>Primeira resposta enviada</dt><dd>{{ chamado.primeira_resposta_em|date:'d/m/Y H:i' }}</dd></div>{% endif %}
+    <div><dt>Resolução até</dt><dd>{{ chamado.prazo_resolucao|date:'d/m/Y H:i'|default:'—' }}</dd></div>
+    <div><dt>Aberto em</dt><dd>{{ chamado.criado_em|date:'d/m/Y H:i' }}</dd></div>
+    <div><dt>Atualizado em</dt><dd>{{ chamado.atualizado_em|date:'d/m/Y H:i' }}</dd></div>
+  </dl><p class="muted">Prazos em horas corridas. Aguardando usuário pausa a contagem; ao retomar, as datas são prorrogadas pelo tempo de pausa. Aguardando terceiro não pausa.</p></aside>
+</div>
 {% endblock %}

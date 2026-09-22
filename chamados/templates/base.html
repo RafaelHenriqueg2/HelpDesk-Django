@@ -5,36 +5,43 @@
   <title>{% block title %}HelpDesk{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'chamados/style.css' %}">
   <link rel="stylesheet" href="{% static 'chamados/django.css' %}?v=4">
+  {% if request.resolver_match.url_name != 'login' %}<link rel="stylesheet" href="{% static 'chamados/portal.css' %}?v=1">{% endif %}
   <script src="{% static 'chamados/theme.js' %}"></script>
   <script src="{% static 'chamados/app.js' %}?v=4" defer></script>
 </head>
 <body>
 {% block body %}
 <div class="app-shell">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
   <aside class="sidebar">
     <a class="brand" href="{% url 'inicio' %}"><span class="brand-mark">H</span><span>Help<span class="brand-accent">Desk</span></span></a>
     <nav class="sidebar-nav" aria-label="Navegação principal">
-      <p class="nav-section-label">Menu principal</p>
+      <p class="nav-section-label">Atendimento</p>
       {% if user.eh_administrador %}
-      <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span>Dashboard</a>
-      <a href="{% url 'usuarios' %}" class="{% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}"><span class="nav-icon">♙</span>Usuários</a>
-      <a href="{% url 'auditoria' %}"><span class="nav-icon">◷</span>Auditoria de login</a>
+      <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='grid' %}Visão geral</a>
+      <a href="{% url 'usuarios' %}" {% if request.resolver_match.url_name == 'usuarios' or request.resolver_match.url_name == 'usuario' or request.resolver_match.url_name == 'usuario_excluir' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='users' %}Usuários</a>
+      <a href="{% url 'auditoria' %}" {% if request.resolver_match.url_name == 'auditoria' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='clock' %}Auditoria de login</a>
       {% else %}
-      <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><span class="nav-icon">⌂</span>Visão geral</a>
-      <a href="{% url 'home' %}#tickets"><span class="nav-icon">▤</span>Meus chamados</a>
+      <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='grid' %}Visão geral</a>
+      <a href="{% url 'home' %}#tickets">{% include 'chamados/icon.html' with nome='ticket' %}Meus chamados</a>
       {% endif %}
-      <a href="{% url 'novo' %}" class="{% if request.resolver_match.url_name == 'novo' %}active{% endif %}"><span class="nav-icon">＋</span>Abrir chamado</a>
+      <a href="{% url 'novo' %}" {% if request.resolver_match.url_name == 'novo' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='plus' %}Abrir chamado</a>
+      <a href="{% url 'notificacoes' %}" {% if request.resolver_match.url_name == 'notificacoes' %}class="active" aria-current="page"{% endif %}>{% include 'chamados/icon.html' with nome='bell' %}Notificações <span class="nav-count" data-notification-count>{{ notificacoes_pendentes }}</span></a>
     </nav>
-    <a class="notification-link" href="{% url 'notificacoes' %}">Notificações <span data-notification-count>{{ notificacoes_pendentes }}</span></a>
-    <div class="support-card"><span class="support-icon">?</span><strong>Precisa de ajuda?</strong><p>Abra um chamado e nossa equipe entrará em contato.</p><a href="{% url 'novo' %}">Solicitar suporte</a></div>
-    <button type="button" class="theme-toggle theme-toggle-with-label sidebar-theme-toggle" data-theme-toggle>◐ <strong>Alternar tema</strong></button>
-    <div class="sidebar-user"><span class="user-avatar">{{ user.nome|first }}</span><span class="user-summary"><strong>{{ user.nome }}</strong><small>{{ user.email }}</small></span><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout-button" title="Sair" aria-label="Sair">↪</button></form></div>
+    <div class="support-card"><span class="support-icon">{% include 'chamados/icon.html' with nome='ticket' %}</span><strong>Conte com a gente.</strong><p>Descreva o que precisa. Acompanhe cada resposta por aqui.</p><a href="{% url 'novo' %}">Solicitar suporte <span aria-hidden="true">↗</span></a></div>
+    <button type="button" class="theme-toggle theme-toggle-with-label sidebar-theme-toggle" data-theme-toggle>{% include 'chamados/icon.html' with nome='moon' %}<strong>Alternar tema</strong></button>
+    <div class="sidebar-user"><span class="user-avatar">{{ user.nome|first }}</span><span class="user-summary"><strong>{{ user.nome }}</strong><small>{{ user.email }}</small></span><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout-button" title="Sair" aria-label="Sair">{% include 'chamados/icon.html' with nome='logout' %}</button></form></div>
   </aside>
   <div class="app-content">
+    <header class="workspace-header"><div><span class="workspace-dot" aria-hidden="true"></span>Central de atendimento <span class="header-divider">/</span> <span class="muted">{% if user.eh_administrador %}Equipe de suporte{% else %}Meu espaço{% endif %}</span></div><span class="workspace-label">{% if user.eh_administrador %}Administrador{% else %}Portal do usuário{% endif %}</span></header>
     <header class="mobile-topbar"><a class="brand" href="{% url 'inicio' %}"><span class="brand-mark">H</span>HelpDesk</a><div class="mobile-topbar-actions"><button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">◐</button><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout-button">Sair</button></form></div></header>
-    <nav class="mobile-nav" aria-label="Navegação móvel"><a href="{% url 'inicio' %}">Chamados</a><a href="{% url 'novo' %}">Abrir chamado</a>{% if user.eh_administrador %}<a href="{% url 'usuarios' %}">Usuários</a><a href="{% url 'auditoria' %}">Auditoria</a>{% endif %}</nav>
+    <nav class="mobile-nav" aria-label="Navegação móvel">
+      <a href="{% url 'inicio' %}" {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>Chamados</a>
+      <a href="{% url 'novo' %}" {% if request.resolver_match.url_name == 'novo' %}aria-current="page"{% endif %}>Abrir chamado</a>
+      {% if user.eh_administrador %}<a href="{% url 'usuarios' %}" {% if request.resolver_match.url_name == 'usuarios' or request.resolver_match.url_name == 'usuario' or request.resolver_match.url_name == 'usuario_excluir' %}aria-current="page"{% endif %}>Usuários</a><a href="{% url 'auditoria' %}" {% if request.resolver_match.url_name == 'auditoria' %}aria-current="page"{% endif %}>Auditoria</a>{% endif %}
+    </nav>
     <div class="mobile-notifications"><a href="{% url 'notificacoes' %}">Notificações · <span data-notification-count>{{ notificacoes_pendentes }}</span> não lidas</a></div>
-    <main class="page-container">
+    <main class="page-container" id="conteudo" tabindex="-1">
       {% for mensagem in messages %}<p role="status" class="form-message {% if mensagem.tags == 'error' %}form-message-error{% else %}form-message-success{% endif %}">{{ mensagem }}</p>{% endfor %}
       {% block content %}{% endblock %}
       <footer class="page-footer">HelpDesk acadêmico · <span id="connection-status" role="status">Verificando conexão…</span></footer>

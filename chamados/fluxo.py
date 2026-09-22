@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Q
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import (Usuario, Chamado, Categoria, Anexo, MensagemChamado,
@@ -73,10 +72,6 @@ def notificacoes_visiveis(usuario):
     consulta = Notificacao.objects.filter(usuario=usuario,
         chamado__in=Chamado.objects.permitidos(usuario)).select_related('chamado')
     return consulta if usuario.eh_administrador else consulta.filter(interna=False)
-
-
-def marcar_lidas(usuario, chamado):
-    notificacoes_visiveis(usuario).filter(chamado=chamado, lida_em__isnull=True).update(lida_em=timezone.now())
 
 
 def validar_arquivos(arquivos):

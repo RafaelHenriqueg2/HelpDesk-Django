@@ -15,19 +15,19 @@
     </form>
   </section>
   <section class="panel">
-    <h2>Usuários cadastrados</h2>
+    <div class="section-heading"><h2>Usuários cadastrados</h2><span class="result-count">{{ pagina.paginator.count }} conta{{ pagina.paginator.count|pluralize:'s' }}</span></div>
     <form method="get" class="search-form">
       <input name="q" value="{{ busca }}" type="search" placeholder="Buscar nome ou e-mail" aria-label="Buscar usuários">
       <button class="secondary-button">Buscar</button>
     </form>
-    <div class="table-scroll"><table>
-      <thead><tr><th>Nome / E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Usuários cadastrados; role para ver todas as colunas"><table>
+      <thead><tr><th scope="col">Nome / E-mail</th><th scope="col">Perfil</th><th scope="col">Situação</th><th scope="col">Ações</th></tr></thead>
       <tbody>
         {% for usuario in pagina %}
         <tr>
           <td><a class="text-link" href="{% url 'usuario' usuario.id %}"><strong>{{ usuario.nome }}</strong><br><small>{{ usuario.email }}</small></a></td>
           <td>{{ usuario.get_perfil_display }}</td>
-          <td>{{ usuario.is_active|yesno:'Ativo,Desativado' }}</td>
+          <td><span class="status-badge {% if usuario.is_active %}status-resolved{% else %}status-cancelled{% endif %}">{{ usuario.is_active|yesno:'Ativo,Desativado' }}</span></td>
           <td>
             {% if usuario.pode_excluir %}
             <a class="danger-link" href="{% url 'usuario_excluir' usuario.id %}" aria-label="Excluir {{ usuario.nome }}">Excluir</a>

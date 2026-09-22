@@ -1,8 +1,13 @@
+# Portal, autenticação por sessão e banco de dados.
 Django>=5.2.8,<5.3
+# API REST e autenticação por token.
 djangorestframework>=3.16,<4
 PyJWT>=2.10,<3
+# Leitura do .env e conexão PostgreSQL/Supabase.
 python-dotenv>=1.1,<2
 dj-database-url>=3,<4
 psycopg[binary]>=3.2,<4
+# Verificação do conteúdo de imagens anexadas.
 Pillow>=11,<13
+# Suporte ao BCryptPasswordHasher configurado para senhas compatíveis.
 bcrypt>=4,<6

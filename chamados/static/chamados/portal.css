@@ -1,0 +1,284 @@
+/* Interface interna. Escopo isolado para preservar integralmente o login. */
+.app-shell {
+  --background: #f6f7f9;
+  --surface: #fff;
+  --surface-soft: #f8f9fc;
+  --foreground: #202938;
+  --muted: #697386;
+  --border: #e6e9ef;
+  --primary: #4563d5;
+  --primary-dark: #354fb8;
+  --primary-soft: #eef2ff;
+  --success: #287956;
+  --warning: #966018;
+  --danger: #ba414c;
+  --shadow: 0 2px 4px rgb(24 39 75 / 2%);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  grid-template-columns: 244px minmax(0, 1fr);
+  min-height: 100vh;
+}
+:root[data-theme='dark'] .app-shell {
+  color-scheme: dark;
+  --background: #12161e;
+  --surface: #191f2a;
+  --surface-soft: #202735;
+  --foreground: #e8edf5;
+  --muted: #a5afc0;
+  --border: #2b3443;
+  --primary: #9badff;
+  --primary-dark: #b5c2ff;
+  --primary-soft: #293351;
+  --success: #85d7ac;
+  --warning: #e4bd7e;
+  --danger: #ff9ca5;
+  --shadow: none;
+}
+.app-shell *, .app-shell *::before, .app-shell *::after { box-sizing: border-box; }
+.app-shell .icon { flex-shrink: 0; vertical-align: middle; }
+.app-shell a, .app-shell button, .app-shell input, .app-shell select, .app-shell textarea, .app-shell summary { -webkit-tap-highlight-color: transparent; }
+.app-shell :focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
+.app-shell .skip-link { position: fixed; top: -100px; left: 16px; z-index: 20; background: var(--surface); padding: 12px 20px; border-radius: 8px; }
+.app-shell .skip-link:focus { top: 12px; }
+.app-shell .sidebar { top: 0; height: 100dvh; padding: 30px 18px 16px; overflow-y: auto; background: var(--surface); }
+.app-shell .sidebar .brand { margin: 0 12px 42px; gap: 10px; font-size: 23px; letter-spacing: -.8px; }
+.app-shell .brand-mark { width: 34px; height: 34px; flex-basis: 34px; border-radius: 10px; background: #4563d5; box-shadow: none; font-size: 20px; }
+.app-shell .brand-accent { color: var(--foreground); font-weight: 400; }
+.app-shell .nav-section-label { color: var(--muted); letter-spacing: .12em; font-size: 10px; margin: 0 12px 13px; }
+.app-shell .sidebar-nav { gap: 5px; }
+.app-shell .sidebar-nav a { min-height: 44px; gap: 12px; padding: 11px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; }
+.app-shell .sidebar-nav a.active { color: var(--primary); background: var(--primary-soft); font-weight: 650; }
+.app-shell .nav-count { margin-left: auto; min-width: 23px; padding: 0 6px; text-align: center; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; }
+.app-shell .support-card { margin-top: auto; padding: 18px 14px 8px; border: 0; border-radius: 0; background: none; }
+.app-shell .support-icon { background: var(--surface-soft); color: var(--muted); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 10px; }
+.app-shell .support-card strong { font-size: 12px; font-weight: 650; }
+.app-shell .support-card p { color: var(--muted); font-size: 12px; line-height: 1.65; margin-bottom: 10px; }
+.app-shell .support-card a { font-size: 12px; font-weight: 600; }
+.app-shell .theme-toggle { box-shadow: none; background: transparent; color: var(--muted); border: 0; font-size: 13px; min-height: 42px; }
+.app-shell .theme-toggle:hover { transform: none; background: var(--surface-soft); }
+.app-shell .sidebar-theme-toggle { margin-top: 20px; flex: 0 0 42px; }
+.app-shell .theme-toggle strong { font-size: 12px; font-weight: 500; }
+.app-shell .sidebar-user { padding: 18px 0 0; margin-top: 12px; gap: 9px; }
+.app-shell .user-avatar { width: 34px; height: 34px; flex-basis: 34px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+.app-shell .user-summary strong { font-size: 12px; font-weight: 600; }
+.app-shell .user-summary small { font-size: 10px; color: var(--muted); }
+.app-shell .logout-button { color: var(--muted); display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 40px; padding: 6px; }
+.app-shell .logout-button:hover { background: var(--surface-soft); color: var(--danger); }
+.app-shell .workspace-header { height: 76px; padding: 0 40px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 12px; }
+.app-shell .workspace-header > div { display: flex; align-items: center; gap: 12px; }
+.app-shell .workspace-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+.app-shell .header-divider { color: var(--border); margin: 0 4px; }
+.app-shell .workspace-label { color: var(--muted); font-size: 11px; border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; }
+.app-shell .page-container { width: min(1280px, 100%); padding: 42px 40px 24px; }
+.app-shell .eyebrow { font-size: 10px; letter-spacing: .14em; color: var(--muted); font-weight: 650; margin-bottom: 8px; }
+.app-shell h1 { margin: 0; font-size: clamp(26px, 2.5vw, 34px); line-height: 1.2; letter-spacing: -1.1px; font-weight: 650; }
+.app-shell h2 { font-size: 16px; line-height: 1.4; font-weight: 650; letter-spacing: -.25px; margin: 0 0 18px; }
+.app-shell h3 { font-size: 16px; font-weight: 600; }
+.app-shell .muted { color: var(--muted); }
+.app-shell .dashboard-hero { align-items: center; gap: 24px; margin-bottom: 28px; }
+.app-shell .dashboard-hero > div > p:last-child, .app-shell .form-page-heading > p:last-child { font-size: 13px; color: var(--muted); margin: 10px 0 0; line-height: 1.7; max-width: 620px; }
+.app-shell .page-heading { display: block; margin-bottom: 28px; }
+.app-shell .page-heading > .muted { margin: 10px 0 0; }
+.app-shell .primary-button, .app-shell .secondary-button { font-size: 12px; min-height: 42px; padding: 10px 16px; font-weight: 600; border-radius: 8px; box-shadow: none; white-space: normal; text-align: center; line-height: 1.5; gap: 8px; }
+.app-shell .primary-button { background: #4563d5; color: #fff; border: 1px solid #4563d5; }
+.app-shell .primary-button:hover { background: #354fb8; border-color: #354fb8; transform: none; }
+.app-shell .secondary-button { background: var(--surface); color: var(--foreground); border: 1px solid var(--border); }
+.app-shell .secondary-button:hover { background: var(--surface-soft); transform: none; }
+.app-shell .primary-button .icon { width: 17px; height: 17px; }
+.app-shell .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.app-shell .stat { padding: 20px 22px; border: 0; border-radius: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); box-shadow: none; background: transparent; }
+.app-shell .stat:nth-child(4n) { border-right: 0; }
+.app-shell .stat:nth-last-child(-n+4) { border-bottom: 0; }
+.app-shell .stat span { font-size: 11px; font-weight: 500; color: var(--muted); }
+.app-shell .stat strong { font-size: 29px; line-height: 1.2; letter-spacing: -1px; font-weight: 550; margin-top: 9px; font-variant-numeric: tabular-nums; }
+.app-shell .stat:first-child { background: var(--primary-soft); }
+.app-shell .stat:first-child strong { color: var(--primary); }
+.app-shell .tickets-section { margin-top: 34px; }
+.app-shell .section-heading { align-items: center; margin-bottom: 20px; }
+.app-shell .section-heading h2 { margin: 0; font-size: 17px; }
+.app-shell .section-heading p { font-size: 12px; margin-top: 5px; color: var(--muted); }
+.app-shell .result-count { color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; font-size: 11px; white-space: nowrap; }
+.app-shell input, .app-shell select, .app-shell textarea { margin-top: 7px; font-size: 13px; border: 1px solid var(--border); color: var(--foreground); background: var(--surface); border-radius: 8px; padding: 11px 12px; min-height: 43px; line-height: 1.5; box-shadow: none; }
+.app-shell input::placeholder, .app-shell textarea::placeholder { color: var(--muted); opacity: .85; }
+.app-shell input:focus, .app-shell select:focus, .app-shell textarea:focus { outline: 2px solid var(--primary); outline-offset: 2px; border-color: transparent; box-shadow: none; }
+.app-shell input[type='checkbox'] { min-height: 18px; width: 18px; accent-color: #4563d5; }
+.app-shell input[type='file'] { padding: 10px; background: var(--surface-soft); border-style: dashed; cursor: pointer; max-width: 100%; }
+.app-shell input[type='file']::file-selector-button { border: 1px solid var(--border); padding: 7px 10px; border-radius: 5px; margin-right: 12px; color: var(--foreground); background: var(--surface); font: inherit; cursor: pointer; }
+.app-shell .search-form { gap: 10px; margin: 0 0 14px; }
+.app-shell .search-form input, .app-shell .search-form select { margin-top: 0; }
+.app-shell .search-field { width: auto; min-width: 220px; flex: 1; }
+.app-shell .search-field > .icon { position: absolute; left: 13px; top: 12px; width: 18px; height: 18px; color: var(--muted); }
+.app-shell .search-field input { padding-left: 40px; font-size: 13px; }
+.app-shell .search-form .back-link { padding: 10px 8px; margin: 0; }
+.app-shell .filter-panel { border: 1px solid var(--border); border-radius: 9px; background: var(--surface); margin-bottom: 20px; padding: 0; box-shadow: none; }
+.app-shell .filter-panel > summary { padding: 12px 16px; color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; }
+.app-shell .filter-panel[open] > summary { color: var(--foreground); border-bottom: 1px solid var(--border); }
+.app-shell .filter-panel > form { padding: 0 16px 16px; }
+.app-shell .advanced-filters { gap: 16px; }
+.app-shell .advanced-filters label { flex: 1 1 170px; }
+.app-shell .ticket-list { gap: 12px; }
+.app-shell .ticket-card { background: var(--surface); padding: 21px 24px; gap: 20px; border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); }
+.app-shell .ticket-card:hover { transform: none; border-color: var(--primary); box-shadow: var(--shadow); }
+.app-shell .ticket-heading { gap: 12px; flex-wrap: wrap; }
+.app-shell .protocol { font-size: 11px; color: var(--muted); font-weight: 550; letter-spacing: .01em; }
+.app-shell .status-badge { padding: 4px 9px; font-size: 10px; font-weight: 600; border-radius: 5px; line-height: 1.5; color: var(--muted); background: var(--surface-soft); }
+.app-shell .status-open { color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, var(--surface)); }
+.app-shell .status-in_progress { color: var(--primary); background: var(--primary-soft); }
+.app-shell .status-waiting_user, .app-shell .status-waiting_third { color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, var(--surface)); }
+.app-shell .status-resolved, .app-shell .status-closed { color: var(--success); background: color-mix(in srgb, var(--success) 10%, var(--surface)); }
+.app-shell .status-cancelled { color: var(--muted); background: var(--surface-soft); }
+.app-shell .ticket-title { font-size: 15px; font-weight: 650; margin-top: 11px; letter-spacing: -.2px; }
+.app-shell .ticket-card p { font-size: 12px; color: var(--muted); margin: 5px 0 14px; line-height: 1.7; max-width: none; }
+.app-shell .ticket-meta { font-size: 11px; color: var(--muted); gap: 8px 18px; flex-wrap: wrap; }
+.app-shell .ticket-context { border-top: 1px solid var(--border); margin-top: 15px; padding-top: 12px; }
+.app-shell .ticket-context .deadline-overdue { margin-left: auto; }
+.app-shell .ticket-arrow { color: var(--muted); display: flex; }
+.app-shell .unread-badge { background: var(--primary-soft); color: var(--primary); font-size: 10px; padding: 3px 7px; font-weight: 600; border-radius: 5px; }
+.app-shell .panel, .app-shell .empty-state { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 12px; }
+.app-shell .panel { padding: 26px; min-width: 0; }
+.app-shell .empty-state { padding: 52px 24px; }
+.app-shell .empty-icon { width: 46px; height: 46px; border-radius: 13px; background: var(--primary-soft); color: var(--primary); }
+.app-shell .empty-state p { font-size: 13px; max-width: 400px; margin: 0 auto 22px; }
+.app-shell .back-link { display: inline-flex; font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 22px; }
+.app-shell .back-link:hover { color: var(--primary); }
+.app-shell .form-page-heading { margin-bottom: 25px; }
+.app-shell .form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 28px; align-items: start; }
+.app-shell .form-panel { max-width: none; }
+.app-shell .form-guide { padding: 16px 4px; color: var(--muted); font-size: 12px; }
+.app-shell .form-guide h2 { color: var(--foreground); font-size: 14px; }
+.app-shell .form-guide ol { padding-left: 18px; }
+.app-shell .form-guide li { margin-bottom: 18px; padding-left: 5px; }
+.app-shell .field { gap: 5px; margin-bottom: 22px; }
+.app-shell .field label, .app-shell label { font-size: 12px; font-weight: 600; }
+.app-shell .field input, .app-shell .field textarea, .app-shell .field select { margin-top: 0; }
+.app-shell .field small { font-size: 11px; line-height: 1.6; }
+.app-shell .field label > span { color: var(--primary); }
+.app-shell .form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--border); }
+.app-shell .errorlist { background: color-mix(in srgb, var(--danger) 8%, var(--surface)); color: var(--danger); border-color: var(--danger); border-radius: 6px; font-size: 12px; }
+.app-shell .users-grid { grid-template-columns: minmax(260px, .8fr) minmax(0, 1.6fr); gap: 24px; }
+.app-shell .users-grid .muted { font-size: 12px; }
+.app-shell .table-scroll { overflow-x: auto; }
+.app-shell table { font-size: 12px; width: 100%; border-collapse: collapse; }
+.app-shell th { color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; background: var(--surface-soft); }
+.app-shell th, .app-shell td { padding: 15px 12px; border-bottom: 1px solid var(--border); }
+.app-shell td { font-size: 12px; line-height: 1.7; }
+.app-shell td small { color: var(--muted); font-size: 11px; }
+.app-shell tbody tr:last-child td { border-bottom: 0; }
+.app-shell tbody tr:hover { background: var(--surface-soft); }
+.app-shell .text-link { color: var(--primary); }
+.app-shell .text-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.app-shell .danger-link, .app-shell .danger-button { color: var(--danger); }
+.app-shell .danger-button { border-color: var(--danger); }
+.app-shell .ticket-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.app-shell .ticket-detail-heading h1 { font-size: clamp(24px, 2.4vw, 32px); }
+.app-shell .ticket-detail-heading .status-badge { flex-shrink: 0; }
+.app-shell .ticket-detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 24px; align-items: start; }
+.app-shell .detail-main { min-width: 0; }
+.app-shell .ticket-detail-layout > .ticket-information-panel { position: sticky; top: 24px; }
+.app-shell .preserve-lines { color: var(--foreground); font-size: 13px; line-height: 1.9; }
+.app-shell .ticket-information-panel h2 { font-size: 14px; }
+.app-shell .ticket-information-panel dl { margin: 0; gap: 0; }
+.app-shell .ticket-information-panel dl > div { padding: 10px 0; border-bottom: 1px solid var(--border); display: block; }
+.app-shell .ticket-information-panel dt { font-size: 10px; color: var(--muted); font-weight: 500; margin-bottom: 3px; }
+.app-shell .ticket-information-panel dd { margin: 0; color: var(--foreground); font-size: 12px; font-weight: 500; }
+.app-shell .ticket-information-panel > .muted { font-size: 11px; line-height: 1.75; margin: 16px 0 0; }
+.app-shell .history-panel { margin-top: 24px; }
+.app-shell .action-section { border-color: var(--border); padding: 18px 0; }
+.app-shell .action-section:last-child { padding-bottom: 0; }
+.app-shell .action-section summary { font-size: 13px; margin: 0; color: var(--foreground); font-weight: 550; cursor: pointer; }
+.app-shell .action-section[open] summary { margin-bottom: 22px; }
+.app-shell .action-section p { font-size: 12px; color: var(--muted); }
+.app-shell .solution-box { border-color: var(--success); background: color-mix(in srgb, var(--success) 7%, var(--surface)); border-radius: 6px; }
+.app-shell .ticket-message { max-width: 850px; width: 90%; padding: 18px 20px; border-radius: 10px; margin: 16px 0; border: 1px solid var(--border); background: var(--surface-soft); }
+.app-shell .ticket-message-admin { margin-left: auto; background: var(--primary-soft); border-color: transparent; }
+.app-shell .ticket-message strong { font-size: 12px; }
+.app-shell .ticket-message small { display: block; color: var(--muted); font-size: 10px; margin-top: 3px; }
+.app-shell .ticket-message p { margin: 12px 0 0; }
+.app-shell .internal-note { border: 1px dashed var(--warning); background: color-mix(in srgb, var(--warning) 7%, var(--surface)); }
+.app-shell .message-form { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px; }
+.app-shell .event-item { padding: 18px 0; border-color: var(--border); }
+.app-shell .event-item:last-child { border-bottom: 0; }
+.app-shell .event-item strong { font-size: 12px; }
+.app-shell .event-item small { color: var(--muted); font-size: 11px; }
+.app-shell .event-item p { margin: 7px 0; font-size: 12px; }
+.app-shell .notification-item { display: flex; align-items: flex-start; gap: 16px; }
+.app-shell .notification-symbol { padding: 9px; border: 1px solid var(--border); background: var(--surface-soft); border-radius: 10px; color: var(--muted); }
+.app-shell .notification-item.is-unread .notification-symbol { color: var(--primary); background: var(--primary-soft); border-color: transparent; }
+.app-shell .notification-item > div { flex: 1; min-width: 0; }
+.app-shell .notification-item .text-link { color: var(--foreground); font-size: 13px; font-weight: 550; }
+.app-shell .notification-item .unread-badge { white-space: nowrap; }
+.app-shell .deadline-overdue { color: var(--danger) !important; }
+.app-shell .access-failed { color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--surface)); }
+.app-shell .table-empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+.app-shell .pagination { font-size: 12px; gap: 16px; margin-top: 24px; }
+.app-shell .form-message { border: 1px solid var(--border); border-radius: 8px; padding: 13px 16px; font-size: 12px; font-weight: 500; }
+.app-shell .form-message-success { background: color-mix(in srgb, var(--success) 8%, var(--surface)); color: var(--success); }
+.app-shell .form-message-error { background: color-mix(in srgb, var(--danger) 8%, var(--surface)); color: var(--danger); }
+.app-shell .page-footer { border-top: 1px solid var(--border); margin-top: 42px; padding-top: 20px; font-size: 10px; color: var(--muted); text-align: left; }
+.app-shell .mobile-nav a { min-height: 40px; display: inline-flex; align-items: center; }
+.app-shell .mobile-nav a[aria-current='page'] { color: var(--foreground); box-shadow: inset 0 -2px var(--primary); font-weight: 600; }
+:root[data-theme='dark'] .app-shell .support-card { background: none; border: 0; }
+:root[data-theme='dark'] .app-shell .support-card p { color: var(--muted); }
+@media (min-width: 1600px) { .app-shell .page-container { padding-top: 50px; } }
+@media (max-height: 800px) and (min-width: 761px) {
+  .app-shell .support-card { display: none; }
+  .app-shell .sidebar-theme-toggle { margin-top: auto; }
+}
+@media (max-width: 1180px) {
+  .app-shell { grid-template-columns: 216px minmax(0, 1fr); }
+  .app-shell .page-container { padding: 32px 26px 24px; }
+  .app-shell .workspace-header { padding: 0 26px; }
+  .app-shell .users-grid { grid-template-columns: 1fr; }
+  .app-shell .form-layout { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .form-guide { border-top: 1px solid var(--border); }
+  .app-shell .ticket-detail-layout { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .detail-main { display: contents; }
+  .app-shell .ticket-detail-layout > .ticket-information-panel { position: static; grid-row: 2; }
+  .app-shell .ticket-information-panel dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+}
+@media (max-width: 760px) {
+  .app-shell { display: block; }
+  .app-shell .sidebar, .app-shell .workspace-header { display: none; }
+  .app-shell .mobile-topbar { background: var(--surface); border-color: var(--border); min-height: 70px; padding: 14px 20px; }
+  .app-shell .mobile-topbar .brand { font-size: 20px; }
+  .app-shell .mobile-nav { background: var(--surface); padding: 4px 20px; gap: 4px 20px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .app-shell .mobile-notifications { padding: 10px 20px; font-size: 11px; color: var(--primary); border-bottom: 1px solid var(--border); background: var(--surface); }
+  .app-shell .page-container { width: 100%; padding: 28px 20px 20px; }
+  .app-shell h1 { font-size: 28px; }
+  .app-shell .dashboard-hero { flex-direction: column; align-items: stretch; gap: 20px; }
+  .app-shell .dashboard-hero .primary-button { width: 100%; }
+  .app-shell .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .stat { padding: 16px; }
+  .app-shell .stat:nth-child(n) { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .app-shell .stat:nth-child(2n) { border-right: 0; }
+  .app-shell .stat:nth-last-child(-n+2) { border-bottom: 0; }
+  .app-shell .stat strong { font-size: 26px; }
+  .app-shell .section-heading { align-items: flex-start; flex-direction: row; gap: 12px; }
+  .app-shell .section-heading .result-count { display: none; }
+  .app-shell .search-field { flex-basis: 100%; min-width: 0; }
+  .app-shell .search-form select { min-width: 0; }
+  .app-shell .panel { padding: 20px; }
+  .app-shell .table-scroll table { min-width: 520px; }
+  .app-shell input, .app-shell textarea, .app-shell select, .app-shell .field input, .app-shell .field textarea, .app-shell .field select, .app-shell .search-field input { font-size: 16px; }
+  .app-shell .primary-button, .app-shell .secondary-button { min-height: 44px; font-size: 13px; }
+  .app-shell .filter-panel { padding: 0; }
+  .app-shell .ticket-card { padding: 18px; }
+  .app-shell .ticket-meta { flex-direction: row; gap: 7px 14px; }
+  .app-shell .ticket-context .deadline-overdue { margin-left: 0; }
+  .app-shell .ticket-arrow { display: none; }
+  .app-shell .ticket-title { font-size: 14px; }
+  .app-shell .ticket-detail-heading { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .app-shell .ticket-information-panel dl { grid-template-columns: 1fr; }
+  .app-shell .ticket-message { width: 100%; padding: 16px; }
+  .app-shell .form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .app-shell .form-actions > * { width: 100%; }
+  .app-shell .notification-item { gap: 10px; flex-wrap: wrap; }
+  .app-shell .notification-item .unread-badge { margin-left: 48px; }
+  .app-shell .pagination { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

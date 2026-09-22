@@ -12,10 +12,10 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_http_methods
 from .forms import FormularioEntrada, FormularioUsuario, FormularioChamado, FormularioMensagem, FormularioSituacao
-from .models import Usuario, Chamado, RegistroLogin
+from .models import Chamado, RegistroLogin
 from . import services
 from . import fluxo
-from .models import Categoria, Notificacao
+from .models import Categoria
 from .forms import FormularioGestao, FormularioReabertura, FormularioIncidente
 
 def exige_administrador(funcao_pagina):

@@ -8,9 +8,9 @@ Classes, variáveis e campos próprios usam nomes em português. Consulte o [gui
 
 Foram adicionados responsável, categorias, novos estados, confirmação/reabertura, prazos, notas internas, múltiplos anexos, notificações no portal, incidentes relacionados e histórico completo. Veja [o guia de atendimento](docs/ATENDIMENTO.md).
 
-O projeto está preparado para PostgreSQL/Supabase e armazenamento privado de anexos. A conexão com a sua conta ainda precisa ser configurada: [passo a passo](docs/SUPABASE.md). O ambiente atual continua local.
+O projeto integra PostgreSQL/Supabase e armazenamento privado de anexos. Para conectar outra máquina à integração existente, configure as credenciais locais conforme o [passo a passo](docs/SUPABASE.md).
 
-A suite atual tem **73 testes**, executados com SQLite e PostgreSQL 18 local. As listagens da API agora retornam um objeto paginado com `results`; veja as alterações de contrato em [ATENDIMENTO.md](docs/ATENDIMENTO.md).
+A suíte atual tem **73 testes**. A limpeza do código foi validada com SQLite e as dependências de armazenamento instaladas; o histórico de validações está em [VALIDACAO.md](docs/VALIDACAO.md). As listagens da API retornam um objeto paginado com `results`; veja [ATENDIMENTO.md](docs/ATENDIMENTO.md).
 
 Conversão do projeto [samuelcorazzi/HelpDesk](https://github.com/samuelcorazzi/HelpDesk), usando o **`django crud.zip` fornecido como base estrutural**.
 
@@ -130,8 +130,7 @@ HelpDesk-Django/
 ├── .env.example
 ├── requirements.txt
 ├── requirements-lock.txt    # Versões usadas nos testes em Windows/Python 3.14
-├── iniciar.cmd
-└── parar.cmd
+└── iniciar.cmd
 ```
 
 ## Banco de dados
@@ -152,7 +151,7 @@ Use uma conexão direta ou session pooler compatível com migrations; codifique 
 
 **A conversão é do código e das funcionalidades. Os dados existentes do banco Prisma/Supabase não foram importados.** Não foram fornecidos backup ou acesso ao banco original. As tabelas Django são novas e não substituem automaticamente as tabelas Prisma. Não reaproveite o `db.sqlite3` do CRUD de livros.
 
-O caminho PostgreSQL está configurado, mas a validação realizada nesta entrega foi com SQLite. A conexão com seu Supabase depende das suas credenciais e da configuração do serviço.
+A conexão com o Supabase depende das credenciais configuradas em cada máquina. Para conectar ao banco já existente, não é necessário recriar o projeto nem importar novamente os dados.
 
 ## Anexos
 
@@ -164,7 +163,7 @@ O caminho PostgreSQL está configurado, mas a validação realizada nesta entreg
 - O download exige que a conta seja dona do chamado ou administradora.
 - Se a gravação do banco falhar, o arquivo recém-gravado é removido.
 
-Supabase Storage constava como **pendente** no projeto original. Esta entrega preserva o armazenamento local privado. Para múltiplas instâncias em produção, será necessário configurar armazenamento privado compartilhado.
+O projeto suporta armazenamento local privado e Supabase Storage via S3. Para compartilhar anexos entre máquinas, use o mesmo bucket privado e as configurações descritas em [SUPABASE.md](docs/SUPABASE.md).
 
 ## Autenticação e segurança
 
@@ -182,7 +181,7 @@ O segredo de desenvolvimento é gerado em `.django-secret` e ignorado pelo Git. 
 .\.venv\Scripts\python.exe manage.py test chamados
 ```
 
-Foram executados **67 testes automatizados**, com SQLite e PostgreSQL local, cobrindo autenticação, autorização, chamados, anexos, mensagens, exclusão de contas e os novos fluxos de atendimento. Veja `docs/ATENDIMENTO.md`.
+Os **73 testes automatizados** cobrem autenticação, autorização, chamados, anexos, mensagens, exclusão de contas, migrações e fluxos de atendimento. Eles não são executados ao iniciar o servidor. Veja [a revisão da limpeza e das dependências](docs/LIMPEZA.md).
 
 ### Exclusão de usuários
 

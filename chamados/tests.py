@@ -13,10 +13,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.management import call_command, CommandError
 from django.db import IntegrityError, transaction
 from django.test import TestCase, Client, override_settings
-from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient
-from .models import Usuario, Chamado, Anexo, MensagemChamado, RegistroLogin, HistoricoStatus
+from .models import Usuario, Chamado, Anexo, RegistroLogin, HistoricoStatus
 from .forms import FormularioChamado
 from . import services
 

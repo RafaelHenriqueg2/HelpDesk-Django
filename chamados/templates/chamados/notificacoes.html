@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Notificações | HelpDesk{% endblock %}
 {% block content %}
-<p class="eyebrow">Atualizações</p><h1>Notificações</h1>
-<p class="muted">Ao abrir um chamado, suas notificações são marcadas como lidas.</p>
-<form method="post">{% csrf_token %}<button class="secondary-button">Marcar todas como lidas</button></form>
+<section class="dashboard-hero"><div><p class="eyebrow">Fique por dentro</p><h1>Notificações</h1><p>As novidades dos seus atendimentos, organizadas em um só lugar.</p></div><form method="post">{% csrf_token %}<button class="secondary-button">Marcar todas como lidas</button></form></section>
 <section class="panel history-panel">
-{% for item in pagina %}<article class="event-item">
-<a class="text-link" href="{% url 'detalhe' item.chamado.id %}">{{ item.chamado.protocolo }} · {{ item.titulo }}</a>
+{% for item in pagina %}<article class="event-item notification-item {% if not item.lida_em %}is-unread{% endif %}">
+<span class="notification-symbol">{% include 'chamados/icon.html' with nome='bell' %}</span>
+<div><a class="text-link" href="{% url 'detalhe' item.chamado.id %}">{{ item.titulo }}</a><p class="muted">{{ item.chamado.protocolo }} · {{ item.criado_em|date:'d/m/Y H:i' }}</p></div>
 {% if not item.lida_em %}<span class="unread-badge">Não lida</span>{% endif %}
-<p class="muted">{{ item.criado_em|date:'d/m/Y H:i' }}</p></article>
-{% empty %}<p>Nenhuma notificação por enquanto.</p>{% endfor %}
+</article>
+{% empty %}<div class="empty-state"><span class="empty-icon">{% include 'chamados/icon.html' with nome='bell' %}</span><h2>Tudo em dia por aqui.</h2><p>Quando houver uma atualização nos seus chamados, ela aparecerá neste espaço.</p><a class="secondary-button" href="{% url 'inicio' %}">Ver chamados</a></div>{% endfor %}
 </section>{% include 'chamados/pagination.html' %}
 {% endblock %}

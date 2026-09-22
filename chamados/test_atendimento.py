@@ -1,4 +1,3 @@
-import io
 import tempfile
 from datetime import timedelta
 from pathlib import Path
@@ -9,8 +8,7 @@ from django.db import DatabaseError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
-from .models import Usuario, Chamado, Categoria, MensagemChamado, Anexo, Notificacao, EventoChamado
-from .forms import FormularioChamado, FormularioGestao
+from .models import Usuario, Chamado, Categoria, MensagemChamado, Anexo, Notificacao
 from . import fluxo, services
 
 

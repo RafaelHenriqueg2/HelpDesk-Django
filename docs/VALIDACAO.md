@@ -1,5 +1,14 @@
 # Validação da entrega
 
+## Limpeza do código — 22/09/2026
+
+- Windows, Python 3.14.7 e dependências de `requirements-cloud-lock.txt` instaladas.
+- 73 testes passaram com SQLite, sem testes pulados.
+- `manage.py check`, `makemigrations --check --dry-run`, `pip check` e análise Ruff (regras F) passaram.
+- Seletores CSS removidos foram conferidos contra Python, JavaScript e templates; classes dinâmicas de status/urgência e `errorlist` gerada pelo Django foram preservadas. Declarações, ordem e condições de mídia dos seletores mantidos foram comparadas automaticamente.
+- Nenhum modelo ou arquivo de migration foi alterado. Nenhum acesso ao Supabase real foi feito nesta revisão; o teste S3 verifica o bloqueio de URLs públicas sem upload remoto.
+- Detalhes da limpeza e justificativas: [LIMPEZA.md](LIMPEZA.md).
+
 ## Identificadores em português e comentários — 20/09/2026
 
 - 73 testes passaram em SQLite e PostgreSQL 18 isolado.

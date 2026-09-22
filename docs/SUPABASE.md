@@ -1,5 +1,7 @@
 # Banco compartilhado com Supabase
-O projeto está preparado para PostgreSQL e Supabase Storage privado. A conexão real depende de um projeto Supabase e das credenciais do proprietário. Nenhuma conta/projeto Supabase foi criada e os dados locais ainda não foram enviados.
+O projeto integra PostgreSQL e Supabase Storage privado. Cada máquina precisa das credenciais do mesmo projeto Supabase.
+
+Se a integração já existe, configure esta máquina pela seção **Configurar localmente**, selecione o arquivo com `HELPDESK_ENV_FILE` e inicie o servidor. Não repita a criação do projeto, a preparação do banco nem a importação de dados apenas para conectar outra máquina. As seções de preparação e transferência abaixo atendem à primeira configuração ou a uma migração planejada.
 
 ## O que será compartilhado
 O PostgreSQL guarda usuários, chamados, mensagens, histórico e notificações. O Storage guarda o conteúdo dos anexos. Usar apenas banco remoto com pastas de upload diferentes em cada computador faz os anexos faltarem em outras instâncias.

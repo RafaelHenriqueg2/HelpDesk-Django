@@ -1,3 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Auditoria de login | HelpDesk{% endblock %}
-{% block content %}<p class="eyebrow">Administração</p><h1>Auditoria de login</h1><p class="muted">Tentativas de acesso registradas, sem armazenar as senhas informadas.</p><section class="panel table-scroll"><table><thead><tr><th>Data</th><th>E-mail</th><th>Resultado</th><th>IP</th><th>Motivo</th></tr></thead><tbody>{% for registro in pagina %}<tr><td>{{ registro.criado_em|date:'d/m/Y H:i' }}</td><td>{{ registro.email_informado }}</td><td>{{ registro.sucesso|yesno:'Sucesso,Falha' }}</td><td>{{ registro.endereco_ip }}</td><td>{{ registro.motivo_falha|default:'—' }}</td></tr>{% empty %}<tr><td colspan="5">Nenhuma tentativa registrada.</td></tr>{% endfor %}</tbody></table></section>{% include 'chamados/pagination.html' %}{% endblock %}
+{% block content %}
+<div class="page-heading"><p class="eyebrow">Segurança e acesso</p><h1>Auditoria de login</h1><p class="muted">Acompanhe os acessos ao portal. As senhas nunca aparecem neste registro.</p></div>
+<section class="panel">
+  <div class="section-heading"><h2>Histórico de acessos</h2><span class="result-count">{{ pagina.paginator.count }} registro{{ pagina.paginator.count|pluralize:'s' }}</span></div>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Histórico de acessos; role para ver todas as colunas"><table>
+    <thead><tr><th scope="col">Data</th><th scope="col">E-mail</th><th scope="col">Resultado</th><th scope="col">IP</th><th scope="col">Motivo</th></tr></thead>
+    <tbody>{% for registro in pagina %}<tr><td>{{ registro.criado_em|date:'d/m/Y H:i' }}</td><td>{{ registro.email_informado }}</td><td><span class="status-badge {% if registro.sucesso %}status-resolved{% else %}access-failed{% endif %}">{{ registro.sucesso|yesno:'Sucesso,Falha' }}</span></td><td>{{ registro.endereco_ip|default:'—' }}</td><td>{{ registro.motivo_falha|default:'—' }}</td></tr>
+    {% empty %}<tr><td colspan="5"><div class="table-empty">Nenhuma tentativa registrada. Os próximos acessos aparecerão aqui.</div></td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>{% include 'chamados/pagination.html' %}
+{% endblock %}

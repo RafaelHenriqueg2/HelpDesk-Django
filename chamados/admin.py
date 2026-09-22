@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import Usuario, Chamado, Anexo, MensagemChamado, RegistroLogin, HistoricoStatus
+from .models import Usuario, Chamado, MensagemChamado, RegistroLogin, HistoricoStatus
 from .models import Categoria, EventoChamado, Notificacao
 
 class FormularioCriacaoAdministrativa(UserCreationForm):

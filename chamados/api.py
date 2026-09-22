@@ -1,14 +1,12 @@
 """Contrato REST preservado: nomes de campos e rotas do NestJS original."""
-import uuid
 from datetime import timedelta
 import jwt
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.paginator import Paginator
-from django.db import connection, DatabaseError, IntegrityError
+from django.db import DatabaseError, IntegrityError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, ValidationError, APIException
 from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response

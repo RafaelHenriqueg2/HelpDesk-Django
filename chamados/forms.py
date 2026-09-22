@@ -115,9 +115,6 @@ class FormularioChamado(forms.ModelForm):
         fields = ['assunto', 'descricao', 'categoria', 'urgencia']
         labels = {'urgencia': 'Urgência'}
 
-    def clean_anexo(self):
-        return self.cleaned_data.get('anexo', [])
-
 class FormularioMensagem(forms.ModelForm):
     conteudo = forms.CharField(label='Sua mensagem', min_length=1, max_length=2000,
         widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Escreva uma atualização...'}))

@@ -1,2 +1,3 @@
 -r requirements.txt
+# Anexos privados no Supabase Storage pela interface S3.
 django-storages[s3]>=1.14.6,<2
